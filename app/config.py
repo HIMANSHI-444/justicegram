@@ -1,4 +1,6 @@
 import os
+import shutil
+import tempfile
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -18,25 +20,33 @@ def find_data_dir():
 
 RESOLVED_DATA_DIR = find_data_dir()
 
+def get_database_uri():
+    """Resolves database URI with automatic serverless /tmp seeding support."""
+    if os.environ.get('DATABASE_URI'):
+        return os.environ.get('DATABASE_URI')
+
+    if os.environ.get('VERCEL'):
+        tmp_dir = Path(tempfile.gettempdir())
+        tmp_db = tmp_dir / 'justicegram.db'
+        seed_db = RESOLVED_DATA_DIR / 'default_justicegram.db'
+        if not tmp_db.exists():
+            if seed_db.exists():
+                try:
+                    shutil.copyfile(seed_db, tmp_db)
+                except Exception:
+                    tmp_db.touch(exist_ok=True)
+            else:
+                tmp_db.touch(exist_ok=True)
+        return f"sqlite:///{tmp_db.as_posix()}"
+
+    return f"sqlite:///{BASE_DIR / 'justicegram.db'}"
+
 class Config:
     """Base application configuration."""
     SECRET_KEY = os.environ.get('SECRET_KEY', 'justicegram-academic-secret-key-2026')
     
     # Database - SQLite by default with easy migration path to MySQL/PostgreSQL
-    # In Vercel serverless environment, local filesystem root is read-only so use /tmp
-    _default_db = str(BASE_DIR / 'justicegram.db')
-    if os.environ.get('VERCEL'):
-        import shutil
-        tmp_db = Path('/tmp/justicegram.db')
-        seed_db = RESOLVED_DATA_DIR / 'default_justicegram.db'
-        if not tmp_db.exists() and seed_db.exists():
-            try:
-                shutil.copyfile(seed_db, tmp_db)
-            except Exception:
-                pass
-        _default_db = str(tmp_db)
-
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URI', f"sqlite:///{_default_db}")
+    SQLALCHEMY_DATABASE_URI = get_database_uri()
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # AI Model Artifacts Paths
