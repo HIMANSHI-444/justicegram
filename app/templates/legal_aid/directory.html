@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+
+{% block title %}Free Legal Aid & Public Helplines — {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Page Header -->
+  <div class="mb-4">
+    <div class="d-inline-flex align-items-center gap-2 px-3 py-1 bg-navy text-cream rounded-pill fw-semibold small mb-2 border border-cream">
+      <i class="bi bi-heart-fill text-cream"></i> Equal Access to Justice
+    </div>
+    <h1 class="fw-bold mb-1 text-navy">Free Legal Aid & Public Helplines</h1>
+    <p class="text-muted">
+      Access government legal services authorities (DLSA/NALSA), student legal aid cells, and 24x7 public emergency helplines providing free legal advice and representation.
+    </p>
+  </div>
+
+  <!-- National Emergency Helplines Quick Cards -->
+  <div class="row g-3 mb-5">
+    <div class="col-md-3 col-6">
+      <div class="p-3 rounded-3 bg-navy text-white h-100 shadow-sm d-flex flex-column justify-content-between">
+        <div>
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="badge bg-teal small">Cybercrime</span>
+            <i class="bi bi-laptop"></i>
+          </div>
+          <div class="fw-bold fs-4 text-white">1930</div>
+          <small class="text-light opacity-75">National Cyber Helpline</small>
+        </div>
+        <button class="btn btn-outline-light btn-sm mt-3 w-100 btn-copy-helpline" data-number="1930">
+          <i class="bi bi-clipboard me-1"></i> Copy 1930
+        </button>
+      </div>
+    </div>
+
+    <div class="col-md-3 col-6">
+      <div class="p-3 rounded-3 bg-navy text-white h-100 shadow-sm d-flex flex-column justify-content-between">
+        <div>
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="badge bg-warning text-dark small">Consumer</span>
+            <i class="bi bi-cart-check"></i>
+          </div>
+          <div class="fw-bold fs-4 text-white">1915</div>
+          <small class="text-light opacity-75">National Consumer Helpline</small>
+        </div>
+        <button class="btn btn-outline-light btn-sm mt-3 w-100 btn-copy-helpline" data-number="1915">
+          <i class="bi bi-clipboard me-1"></i> Copy 1915
+        </button>
+      </div>
+    </div>
+
+    <div class="col-md-3 col-6">
+      <div class="p-3 rounded-3 bg-navy text-white h-100 shadow-sm d-flex flex-column justify-content-between">
+        <div>
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="badge bg-danger small">Women Safety</span>
+            <i class="bi bi-gender-female"></i>
+          </div>
+          <div class="fw-bold fs-4 text-white">1091</div>
+          <small class="text-light opacity-75">Women in Distress</small>
+        </div>
+        <button class="btn btn-outline-light btn-sm mt-3 w-100 btn-copy-helpline" data-number="1091">
+          <i class="bi bi-clipboard me-1"></i> Copy 1091
+        </button>
+      </div>
+    </div>
+
+    <div class="col-md-3 col-6">
+      <div class="p-3 rounded-3 bg-navy text-white h-100 shadow-sm d-flex flex-column justify-content-between">
+        <div>
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="badge bg-success small">Free Legal Aid</span>
+            <i class="bi bi-bank2"></i>
+          </div>
+          <div class="fw-bold fs-4 text-white">15100</div>
+          <small class="text-light opacity-75">NALSA Legal Aid Toll-Free</small>
+        </div>
+        <button class="btn btn-outline-light btn-sm mt-3 w-100 btn-copy-helpline" data-number="15100">
+          <i class="bi bi-clipboard me-1"></i> Copy 15100
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Filter Sidebar -->
+    <div class="col-lg-3">
+      <div class="jg-card p-3 sticky-top" style="top: 85px;">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0"><i class="bi bi-funnel me-1 text-teal"></i> Filter Aid</h5>
+          <a href="{{ url_for('legal_aid.directory') }}" class="small text-muted text-decoration-none">Reset</a>
+        </div>
+
+        <form method="GET" action="{{ url_for('legal_aid.directory') }}">
+          <!-- Keyword -->
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Search Keywords</label>
+            <input type="text" name="q" class="form-control form-control-sm" placeholder="Clinic name or city..." value="{{ search_keyword }}">
+          </div>
+
+          <!-- Organization Type -->
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Organization Type</label>
+            <select name="type" class="form-select form-select-sm">
+              <option value="">All Organization Types</option>
+              {% for t in org_types %}
+                <option value="{{ t }}" {% if selected_type == t %}selected{% endif %}>{{ t }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Legal Category -->
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Legal Category</label>
+            <select name="category" class="form-select form-select-sm">
+              <option value="">All Categories</option>
+              {% for c in categories.keys() %}
+                {% if c != 'Other / Needs Clarification' %}
+                  <option value="{{ c }}" {% if selected_category == c %}selected{% endif %}>{{ c }}</option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- State -->
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">State / Region</label>
+            <select name="state" class="form-select form-select-sm">
+              <option value="">All States</option>
+              {% for state in all_states %}
+                <option value="{{ state }}" {% if selected_state == state %}selected{% endif %}>{{ state }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn-jg-primary btn-sm w-100">Apply Filters</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Results Cards -->
+    <div class="col-lg-9">
+      <div class="d-flex justify-content-between align-items-center mb-3 bg-white p-2 px-3 rounded-3 border">
+        <span class="small text-muted">Showing <strong>{{ resources|length }}</strong> legal aid centers & helplines</span>
+      </div>
+
+      {% if resources %}
+        <div class="d-flex flex-column gap-3">
+          {% for res in resources %}
+            <div class="jg-card p-4">
+              <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-start gap-2 mb-3">
+                <div>
+                  <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                    <span class="badge bg-teal-soft text-teal fw-semibold">{{ res.organization_type }}</span>
+                    <span class="badge bg-light text-muted border">{{ res.category }}</span>
+                    {% if res.is_free %}
+                      <span class="badge bg-success-subtle text-success fw-bold">100% Free of Cost</span>
+                    {% endif %}
+                  </div>
+                  <h5 class="fw-bold mb-1">{{ res.name }}</h5>
+                  <div class="small text-muted">
+                    <i class="bi bi-geo-alt me-1 text-teal"></i> {{ res.city or 'Pan-India' }}, {{ res.state }}
+                  </div>
+                </div>
+
+                {% if current_user %}
+                  <button 
+                    class="btn btn-sm btn-bookmark-toggle {% if res.id in bookmarked_ids %}btn-primary{% else %}btn-jg-outline{% endif %}"
+                    data-url="{{ url_for('legal_aid.toggle_bookmark', resource_id=res.id) }}"
+                    title="Bookmark this resource">
+                    <i class="bi {% if res.id in bookmarked_ids %}bi-bookmark-fill{% else %}bi-bookmark{% endif %}"></i>
+                  </button>
+                {% endif %}
+              </div>
+
+              <!-- Services Offered -->
+              <div class="mb-3">
+                <small class="text-navy fw-bold d-block mb-1">Services & Assistance Provided:</small>
+                <p class="small text-muted mb-0">{{ res.services_offered }}</p>
+              </div>
+
+              <!-- Eligibility Criteria -->
+              <div class="mb-3 p-3 bg-light rounded-3">
+                <small class="text-navy fw-bold d-block mb-1"><i class="bi bi-check-circle text-success me-1"></i> Eligibility Guidelines:</small>
+                <p class="small text-muted mb-0">{{ res.eligibility_criteria }}</p>
+              </div>
+
+              <!-- Contact & Attribution Bar -->
+              <div class="pt-3 border-top d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
+                <div class="d-flex flex-wrap gap-3 small text-muted">
+                  {% if res.helpline_number %}
+                    <span><i class="bi bi-telephone-fill text-teal me-1"></i> Helpline: <strong class="text-dark">{{ res.helpline_number }}</strong></span>
+                  {% endif %}
+                  {% if res.phone %}
+                    <span><i class="bi bi-telephone me-1 text-teal"></i> Desk: <strong class="text-dark">{{ res.phone }}</strong></span>
+                  {% endif %}
+                  {% if res.email %}
+                    <span><i class="bi bi-envelope me-1 text-teal"></i> {{ res.email }}</span>
+                  {% endif %}
+                </div>
+
+                <div class="small text-muted text-sm-end">
+                  <span>Source: {{ res.source_attribution }} &bull; Verified {{ res.last_verified_date }}</span>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="jg-card p-5 text-center">
+          <i class="bi bi-heartbreak text-muted fs-1 mb-3"></i>
+          <h5 class="fw-bold">No legal aid resources found</h5>
+          <p class="text-muted small mb-3">Try adjusting your filters or search keywords.</p>
+          <a href="{{ url_for('legal_aid.directory') }}" class="btn btn-jg-outline btn-sm">Clear Filters</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

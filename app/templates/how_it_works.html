@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}How JusticeGram Works — {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="max-w-800 mx-auto">
+    <div class="text-center mb-5">
+      <span class="badge bg-navy text-cream fw-bold mb-2 px-3 py-1 text-uppercase border border-cream">Technical Pipeline</span>
+      <h1 class="fw-bold mb-2 text-navy">How JusticeGram Works</h1>
+      <p class="text-muted">A technical breakdown of our multi-stage legal classification, statutory retrieval, and matching architecture.</p>
+    </div>
+
+    <!-- Pipeline Step 1 -->
+    <div class="jg-card p-4 mb-4">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="step-circle fs-5">1</div>
+        <h5 class="fw-bold text-navy mb-0">Input Ingestion & Preprocessing</h5>
+      </div>
+      <p class="text-muted small leading-relaxed">
+        When a user enters a problem in English or Hinglish, the raw text undergoes normalization. This includes URL stripping, punctuation cleanup, lowercasing, and domain-specific stop word filtering (removing both English conversational fillers and common Hinglish stopwords such as <em>"kya", "mera", "ho gaya", "batao"</em>).
+      </p>
+    </div>
+
+    <!-- Pipeline Step 2 -->
+    <div class="jg-card p-4 mb-4">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="step-circle fs-5">2</div>
+        <h5 class="fw-bold text-navy mb-0">Ambiguity & Safety Detection</h5>
+      </div>
+      <p class="text-muted small leading-relaxed">
+        Rather than hallucinating or confidently guessing on overly brief inputs (such as <em>"need lawyer"</em> or <em>"problem with money"</em>), the system checks input length, unique token counts, and vague keyword signatures. If ambiguous, it tags the query as <strong>Other / Needs Clarification</strong> and presents targeted clarifying prompts to guide the user.
+      </p>
+    </div>
+
+    <!-- Pipeline Step 3 -->
+    <div class="jg-card p-4 mb-4">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="step-circle fs-5">3</div>
+        <h5 class="fw-bold text-navy mb-0">TF-IDF Vectorization & Logistic Regression</h5>
+      </div>
+      <p class="text-muted small leading-relaxed">
+        Clean text is transformed into a high-dimensional feature vector using <code>TfidfVectorizer</code> with unigram and bigram extraction (ngram_range=(1, 2)) and sublinear term frequency scaling. A multinomial <code>LogisticRegression</code> classifier with balanced class weights evaluates the feature vector and generates a probability distribution across the 15 Indian legal categories, outputting a primary category and a confidence percentage.
+      </p>
+    </div>
+
+    <!-- Pipeline Step 4 -->
+    <div class="jg-card p-4 mb-4">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="step-circle fs-5">4</div>
+        <h5 class="fw-bold text-navy mb-0">Keyword Heuristic Cross-Check & Subcategory Detection</h5>
+      </div>
+      <p class="text-muted small leading-relaxed">
+        If model confidence falls below a 35% threshold, or if serialized model artifacts are unavailable, JusticeGram seamlessly switches to a rule-based domain keyword heuristic engine. It simultaneously detects fine-grained dispute subcategories (e.g. UPI fraud, marksheet retention, wrongful termination, security deposit) and explains why the classification occurred.
+      </p>
+    </div>
+
+    <!-- Pipeline Step 5 -->
+    <div class="jg-card p-4 mb-4">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="step-circle fs-5">5</div>
+        <h5 class="fw-bold text-navy mb-0">Statutory Retrieval & Lawyer Match Explanations</h5>
+      </div>
+      <p class="text-muted small leading-relaxed">
+        Based on the predicted category and subcategory, JusticeGram retrieves structured guidance from our verified legal knowledge base:
+      </p>
+      <ul class="small text-muted mb-0">
+        <li><strong>Relevant Indian Laws:</strong> Attributable statutory frameworks (BNS, BNSS, BSA, Consumer Protection Act, IT Act, PoSH, RERA) with direct India Code links and verification dates.</li>
+        <li><strong>Document Checklist:</strong> Concrete physical and digital evidence the citizen should organize.</li>
+        <li><strong>Procedural Steps:</strong> Plain-language guidance on notices, pre-institution mediation, or complaint lodgement.</li>
+        <li><strong>Advocate Matching with Explanations:</strong> Matches demonstration advocates and details transparent reasons for the match (specialization, location, pro bono status).</li>
+        <li><strong>Free Legal Aid:</strong> Direct access to NALSA/DLSA clinics and national helplines (1930, 1915, 1091, 15100).</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

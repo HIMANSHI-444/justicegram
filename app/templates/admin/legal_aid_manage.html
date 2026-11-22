@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Legal Aid — Admin — {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 px-lg-5">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-3 border-bottom">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <h2 class="fw-bold mb-0">Free Legal Aid & Helpline Management</h2>
+        <span class="badge bg-navy">{{ resources|length }} Records</span>
+      </div>
+      <p class="text-muted small mb-0">Manage legal services authorities (DLSA/NALSA), student legal aid clinics, and national public helplines.</p>
+    </div>
+
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('admin.dashboard') }}" class="btn btn-jg-outline btn-sm">
+        <i class="bi bi-arrow-left me-1"></i> Dashboard
+      </a>
+      <button type="button" class="btn btn-jg-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addAidModal">
+        <i class="bi bi-plus-circle me-1"></i> Add Legal Aid Center
+      </button>
+    </div>
+  </div>
+
+  <!-- Admin Quick Navigation Tabs -->
+  <div class="d-flex gap-2 mb-4 overflow-auto pb-2">
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-jg-outline btn-sm">Overview & Analytics</a>
+    <a href="{{ url_for('admin.lawyers_manage') }}" class="btn btn-jg-outline btn-sm">Lawyer Management</a>
+    <a href="{{ url_for('admin.legal_aid_manage') }}" class="btn btn-teal btn-sm fw-semibold">Legal Aid Management</a>
+    <a href="{{ url_for('admin.queries_manage') }}" class="btn btn-jg-outline btn-sm">Classification Logs</a>
+    <a href="{{ url_for('admin.inquiries_manage') }}" class="btn btn-jg-outline btn-sm">Consultation Inquiries</a>
+  </div>
+
+  <div class="jg-card p-0 overflow-hidden">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr class="small text-muted">
+            <th>Name & Location</th>
+            <th>Organization Type</th>
+            <th>Category</th>
+            <th>Contact / Helpline</th>
+            <th>Attribution</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for res in resources %}
+            <tr>
+              <td>
+                <div class="fw-bold">{{ res.name }}</div>
+                <small class="text-muted"><i class="bi bi-geo-alt me-1"></i> {{ res.city or 'National' }}, {{ res.state }}</small>
+              </td>
+              <td><span class="badge bg-teal-soft text-teal">{{ res.organization_type }}</span></td>
+              <td><span class="badge bg-light text-muted border">{{ res.category }}</span></td>
+              <td class="small">
+                {% if res.helpline_number %}
+                  <strong>{{ res.helpline_number }}</strong>
+                {% else %}
+                  {{ res.phone or res.email or 'N/A' }}
+                {% endif %}
+              </td>
+              <td class="small text-muted">{{ res.source_attribution }}</td>
+              <td class="text-end">
+                <form action="{{ url_for('admin.legal_aid_delete', res_id=res.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Remove this legal aid resource?');">
+                  <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete Resource">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Add Legal Aid Center -->
+<div class="modal fade" id="addAidModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form action="{{ url_for('admin.legal_aid_add') }}" method="POST">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">Add Legal Aid Resource or Clinic</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Resource / Clinic Name *</label>
+              <input type="text" name="name" class="form-control form-control-sm" placeholder="e.g. Campus Law Centre Legal Aid Society" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Organization Type *</label>
+              <select name="organization_type" class="form-select form-select-sm" required>
+                <option value="Legal Services Authority">Legal Services Authority (DLSA/SLSA/NALSA)</option>
+                <option value="Student Legal Aid Clinic">Student Legal Aid Clinic / College Cell</option>
+                <option value="Pro Bono NGO">Pro Bono NGO / Foundation</option>
+                <option value="Public Helpline">Public Helpline</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Category Focus *</label>
+              <select name="category" class="form-select form-select-sm" required>
+                <option value="All Categories">All Categories</option>
+                {% for c in categories.keys() %}
+                  {% if c != 'Other / Needs Clarification' %}
+                    <option value="{{ c }}">{{ c }}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Helpline Number (if applicable)</label>
+              <input type="text" name="helpline_number" class="form-control form-control-sm" placeholder="e.g. 1915 or 15100">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">City</label>
+              <input type="text" name="city" class="form-control form-control-sm" placeholder="City or leave blank for Pan-India">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">State *</label>
+              <input type="text" name="state" class="form-control form-control-sm" placeholder="e.g. Delhi NCR or National" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Phone Desk</label>
+              <input type="text" name="phone" class="form-control form-control-sm" placeholder="Office Phone">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Email</label>
+              <input type="email" name="email" class="form-control form-control-sm" placeholder="contact@legalaid.gov.in">
+            </div>
+            <div class="col-12">
+              <label class="form-label small fw-semibold">Services Offered *</label>
+              <textarea name="services_offered" class="form-control form-control-sm" rows="2" placeholder="Summary of assistance (free counseling, mediation, student help)..." required></textarea>
+            </div>
+            <div class="col-12">
+              <label class="form-label small fw-semibold">Eligibility Criteria</label>
+              <textarea name="eligibility_criteria" class="form-control form-control-sm" rows="2" placeholder="Income ceiling, student ID requirement, or universal access..."></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-jg-primary btn-sm">Save Legal Aid Resource</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

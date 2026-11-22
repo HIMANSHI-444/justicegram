@@ -1,0 +1,211 @@
+# ==============================================================================
+# JusticeGram — Production .gitignore
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Environment Variables & Secret Credentials
+# ------------------------------------------------------------------------------
+# Never commit real environment secrets, API keys, or production credentials
+.env
+.env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Allow example/template environment files to be committed
+!.env.example
+!.env.template
+
+# Private keys, certificates, and auth credentials
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+secrets.json
+credentials.json
+service_account.json
+client_secret*.json
+
+# ------------------------------------------------------------------------------
+# 2. Python Bytecode, Compilations & Optimizations
+# ------------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+*.pyo
+
+# Distribution / Packaging / Build Artifacts
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ------------------------------------------------------------------------------
+# 3. Virtual Environments
+# ------------------------------------------------------------------------------
+.venv/
+venv/
+venv*/
+env/
+env*/
+ENV/
+env.bak/
+venv.bak/
+
+# ------------------------------------------------------------------------------
+# 4. Databases, Local Storage & Flask Instance Directory
+# ------------------------------------------------------------------------------
+# SQLite databases and journal files (prevent committing runtime data)
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
+*.sql
+*.dump
+
+# Project-specific database files
+justicegram.db
+
+# Flask instance folder (contains instance-specific databases and configs)
+instance/
+!instance/.gitkeep
+
+# ------------------------------------------------------------------------------
+# 5. Production Logs, PIDs & Sockets
+# ------------------------------------------------------------------------------
+*.log
+logs/
+access.log
+error.log
+gunicorn.log
+uwsgi.log
+celery.log
+*.pid
+*.sock
+
+# ------------------------------------------------------------------------------
+# 6. JusticeGram Packaging, Reports & Archive Bundles
+# ------------------------------------------------------------------------------
+# Generated evaluation export packages and zipped bundles
+JusticeGram_Report_Code/
+JusticeGram_Report_Code.zip
+*.zip
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+
+# ------------------------------------------------------------------------------
+# 7. Machine Learning / AI Model Artifacts & Checkpoints
+# ------------------------------------------------------------------------------
+# Large binary weights, serialized caches, and checkpoints
+*.pkl
+*.pickle
+*.h5
+*.hdf5
+*.pt
+*.pth
+*.onnx
+*.bin
+checkpoints/
+wandb/
+.tensorboard/
+
+# Retain the lightweight production model artifacts needed by JusticeGram
+# (Uncomment below if you prefer training on deployment rather than committing them)
+!app/data/model_artifacts/
+!app/data/model_artifacts/model.joblib
+!app/data/model_artifacts/tfidf.joblib
+
+# ------------------------------------------------------------------------------
+# 8. Testing, Code Coverage & Linting Caches
+# ------------------------------------------------------------------------------
+.cache
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+nosetests.xml
+*.cover
+*.py,cover
+.tox/
+.nox/
+.hypothesis/
+.mypy_cache/
+.pyre/
+.pytype/
+.ruff_cache/
+
+# ------------------------------------------------------------------------------
+# 9. Jupyter Notebooks & Data Science Checkpoints
+# ------------------------------------------------------------------------------
+.ipynb_checkpoints
+*-checkpoint.ipynb
+
+# ------------------------------------------------------------------------------
+# 10. Temporary & User Uploaded Files
+# ------------------------------------------------------------------------------
+tmp/
+temp/
+*.tmp
+uploads/
+media/
+
+# ------------------------------------------------------------------------------
+# 11. IDEs, Text Editors & Operating System Metadata
+# ------------------------------------------------------------------------------
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# JetBrains (PyCharm, IntelliJ)
+.idea/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim / Emacs
+*.swp
+*.swo
+*~
+.#*
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/

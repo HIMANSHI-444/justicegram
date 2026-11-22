@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}AI Classification Audit Logs — Admin — {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 px-lg-5">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-3 border-bottom">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <h2 class="fw-bold mb-0">Legal Query Classification Audit Logs</h2>
+        <span class="badge bg-navy">{{ queries|length }} Queries Logged</span>
+      </div>
+      <p class="text-muted small mb-0">Audit incoming user problem descriptions, predicted categories, confidence metrics, and user accuracy ratings.</p>
+    </div>
+
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-jg-outline btn-sm">
+      <i class="bi bi-arrow-left me-1"></i> Dashboard
+    </a>
+  </div>
+
+  <!-- Admin Quick Navigation Tabs -->
+  <div class="d-flex gap-2 mb-4 overflow-auto pb-2">
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-jg-outline btn-sm">Overview & Analytics</a>
+    <a href="{{ url_for('admin.lawyers_manage') }}" class="btn btn-jg-outline btn-sm">Lawyer Management</a>
+    <a href="{{ url_for('admin.legal_aid_manage') }}" class="btn btn-jg-outline btn-sm">Legal Aid Management</a>
+    <a href="{{ url_for('admin.queries_manage') }}" class="btn btn-teal btn-sm fw-semibold">Classification Logs</a>
+    <a href="{{ url_for('admin.inquiries_manage') }}" class="btn btn-jg-outline btn-sm">Consultation Inquiries</a>
+  </div>
+
+  <div class="jg-card p-0 overflow-hidden">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr class="small text-muted">
+            <th>Timestamp</th>
+            <th>User</th>
+            <th>Predicted Category</th>
+            <th>Confidence</th>
+            <th>Ambiguous?</th>
+            <th>Feedback</th>
+            <th>Query Text</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for q in queries %}
+            <tr>
+              <td class="small text-muted text-nowrap">{{ q.created_at.strftime('%Y-%m-%d %H:%M') if q.created_at else '' }}</td>
+              <td class="small">
+                {% if q.user %}
+                  <span class="fw-semibold">{{ q.user.name }}</span>
+                {% else %}
+                  <span class="text-muted fst-italic">Guest</span>
+                {% endif %}
+              </td>
+              <td><span class="badge bg-teal-soft text-teal fw-semibold">{{ q.predicted_category }}</span></td>
+              <td>
+                <span class="fw-bold small {% if q.confidence_score >= 80 %}text-success{% elif q.confidence_score >= 50 %}text-warning{% else %}text-danger{% endif %}">
+                  {{ q.confidence_score }}%
+                </span>
+              </td>
+              <td>
+                {% if q.is_ambiguous %}
+                  <span class="badge bg-warning text-dark"><i class="bi bi-exclamation-circle me-1"></i> Yes</span>
+                {% else %}
+                  <span class="badge bg-success-subtle text-success">No</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if q.user_feedback_accurate is sameas true %}
+                  <span class="badge bg-success"><i class="bi bi-hand-thumbs-up-fill me-1"></i> Accurate</span>
+                {% elif q.user_feedback_accurate is sameas false %}
+                  <span class="badge bg-danger"><i class="bi bi-hand-thumbs-down-fill me-1"></i> Inaccurate</span>
+                {% else %}
+                  <span class="text-muted small">None</span>
+                {% endif %}
+              </td>
+              <td class="small" style="max-width: 320px;">
+                <div class="text-truncate" title="{{ q.query_text }}">{{ q.query_text }}</div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

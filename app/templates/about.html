@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}About JusticeGram — Academic BCA Project{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="max-w-800 mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-5">
+      <span class="badge bg-navy text-cream fw-bold mb-2 px-3 py-1 text-uppercase border border-cream">Academic Mini-Project</span>
+      <h1 class="fw-bold mb-2 text-navy">About JusticeGram</h1>
+      <p class="text-muted">An AI-powered legal literacy, problem categorization, and legal aid discovery platform.</p>
+    </div>
+
+    <div class="jg-card p-4 p-md-5 mb-4 shadow-sm">
+      <h4 class="fw-bold text-navy mb-3">1. Project Background & Motivation</h4>
+      <p class="text-muted leading-relaxed">
+        In India and many developing jurisdictions, ordinary citizens and college students encounter everyday legal issues—such as arbitrary withholding of college marksheets, security deposit deductions by landlords, workplace wage non-payment, consumer e-commerce fraud, and UPI cyber scams. However, navigating the legal ecosystem remains daunting due to complex statutory jargon, lack of awareness regarding appropriate dispute resolution forums, and unfamiliarity with free legal aid mechanisms provided under the Legal Services Authorities Act (1987).
+      </p>
+      <p class="text-muted leading-relaxed">
+        <strong>JusticeGram</strong> was developed as a BCA final/mini-project to bridge this literacy gap. By combining natural language processing (NLP) with curated legal knowledge repositories, the platform enables citizens to describe grievances in natural English or conversational Hinglish, understand the broad domain their issue belongs to, and connect directly with student legal aid clinics, DLSA services, and pro bono legal counsel.
+      </p>
+
+      <hr class="my-4">
+
+      <h4 class="fw-bold text-navy mb-3">2. Core Technical Architecture</h4>
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <div class="p-3 bg-light rounded-3 h-100">
+            <h6 class="fw-bold text-navy"><i class="bi bi-layers me-1"></i> Frontend & UI/UX</h6>
+            <ul class="small text-muted mb-0 ps-3">
+              <li>Responsive HTML5, CSS3 & JavaScript (ES6)</li>
+              <li>Bootstrap 5.3 + Custom Navy (#142133) & Cream (#F4EDE0) Styling</li>
+              <li>Bootstrap Icons (SVG glyphs)</li>
+              <li>Chart.js for interactive analytics visualizations</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="p-3 bg-light rounded-3 h-100">
+            <h6 class="fw-bold text-navy"><i class="bi bi-server me-1"></i> Backend & Database</h6>
+            <ul class="small text-muted mb-0 ps-3">
+              <li>Python 3 with Flask modular architecture</li>
+              <li>Flask-SQLAlchemy ORM with SQLite database</li>
+              <li>Werkzeug PBKDF2 secure password hashing</li>
+              <li>Role-based access control (Admin & User roles)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="p-3 bg-light rounded-3 h-100">
+            <h6 class="fw-bold text-navy"><i class="bi bi-cpu me-1"></i> Machine Learning & NLP</h6>
+            <ul class="small text-muted mb-0 ps-3">
+              <li>TF-IDF (Term Frequency-Inverse Document Frequency)</li>
+              <li>Multi-class Logistic Regression with class-balancing across 15 categories</li>
+              <li>Rule-based keyword heuristic fallback & subcategory detection</li>
+              <li>Ambiguity & brevity detection safety guards</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="p-3 bg-light rounded-3 h-100">
+            <h6 class="fw-bold text-navy"><i class="bi bi-shield-check me-1"></i> Ethical Guardrails</h6>
+            <ul class="small text-muted mb-0 ps-3">
+              <li>Strict informational disclaimers on all outputs</li>
+              <li>26 attributable Indian statutory references with India Code links</li>
+              <li>Official helplines (1930, 1915, 1091, 15100, 1800-180-5522)</li>
+              <li>16 transparently labeled demonstration advocate profiles</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <hr class="my-4">
+
+      <h4 class="fw-bold text-navy mb-3">3. College Project Viva & Evaluation Notes</h4>
+      <p class="text-muted small leading-relaxed">
+        For academic examiners and evaluators:
+      </p>
+      <ul class="small text-muted mb-4 d-flex flex-column gap-2">
+        <li><strong>Dataset Attribution:</strong> The training dataset consists of synthetic and educational legal problem prompts designed for demonstration purposes, covering all 10 target categories. It can be retrained or expanded via <code>app/ai/train_model.py</code>.</li>
+        <li><strong>Offline Resiliency:</strong> The application does not depend on proprietary paid external LLM APIs; the local scikit-learn model and rule engine operate completely offline and deterministically.</li>
+        <li><strong>Database Portability:</strong> The database layer utilizes standard SQLAlchemy models and can easily transition to MySQL, MariaDB, or PostgreSQL by changing the <code>DATABASE_URI</code> environment variable.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

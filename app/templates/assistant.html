@@ -1,0 +1,381 @@
+{% extends "base.html" %}
+
+{% block title %}AI Legal Assistant — {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Page Header -->
+  <div class="mb-4 text-center max-w-700 mx-auto">
+    <div class="d-inline-flex align-items-center gap-2 px-3 py-1 bg-navy text-cream rounded-pill fw-semibold small mb-2 border border-cream">
+      <i class="bi bi-cpu-fill"></i> Machine Learning Legal Classification Engine
+    </div>
+    <h1 class="fw-bold mb-2 text-navy">AI Legal Assistant</h1>
+    <p class="text-muted">
+      Describe your situation in natural English or conversational Hinglish. Our NLP engine classifies your grievance into one of 15 Indian legal domains, retrieves relevant statutory provisions, generates a document checklist, and matches you with specialized counsel and free legal aid.
+    </p>
+  </div>
+
+  <div class="row g-4 justify-content-center">
+    <div class="col-lg-10">
+      <!-- Input Card -->
+      <div class="jg-card p-4 mb-4">
+        <form id="assistantForm" action="{{ url_for('assistant.assistant') }}" method="POST">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <label for="query_text" class="form-label fw-bold mb-0 text-navy">Describe Your Legal Grievance</label>
+            <span id="charCount" class="small text-muted">0 / 3000</span>
+          </div>
+
+          <textarea 
+            id="query_text" 
+            name="query_text" 
+            class="form-control mb-3 p-3 fs-6" 
+            rows="5" 
+            placeholder="Describe the issue clearly. E.g., Who is involved? What agreement or transaction took place? What problem arose, and what outcome are you seeking?" 
+            required>{{ result.query if result else initial_query }}</textarea>
+
+          <!-- Manual Category Override Dropdown -->
+          <div class="row g-3 mb-3 align-items-center">
+            <div class="col-md-7">
+              <label for="manual_category" class="form-label small fw-semibold text-navy mb-1">
+                <i class="bi bi-funnel text-navy me-1"></i> Optional: Select Specific Legal Category Manually
+              </label>
+              <select id="manual_category" name="manual_category" class="form-select form-select-sm border-cream">
+                <option value="">-- Let AI Auto-Classify (Recommended) --</option>
+                {% for cat_name in categories %}
+                  {% if cat_name != 'Other / Needs Clarification' %}
+                    <option value="{{ cat_name }}" {% if selected_manual_cat == cat_name or (result and result.method_used == 'Manual User Selection' and result.category == cat_name) %}selected{% endif %}>
+                      {{ cat_name }}
+                    </option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-5">
+              <span class="small text-muted d-block mt-md-4">
+                <i class="bi bi-info-circle text-navy me-1"></i> You can override AI prediction if you already know your issue's domain.
+              </span>
+            </div>
+          </div>
+
+          <!-- Clickable Sample Prompts -->
+          <div class="mb-3">
+            <span class="small fw-semibold text-navy d-block mb-1">
+              <i class="bi bi-lightbulb text-navy me-1"></i> Or test with realistic everyday scenarios:
+            </span>
+            <div class="d-flex flex-wrap gap-1">
+              {% for sample in sample_prompts %}
+                <button type="button" class="prompt-pill sample-prompt-pill" data-prompt="{{ sample.prompt }}" data-cat="{{ sample.category }}">
+                  {{ sample.title }}
+                </button>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 pt-3 border-top border-cream">
+            <div class="small text-muted">
+              <i class="bi bi-shield-check me-1 text-navy"></i> Confidential and evaluated locally using Scikit-Learn TF-IDF + Logistic Regression.
+            </div>
+            <button id="btnSubmitQuery" type="submit" class="btn btn-jg-primary px-4 py-2 d-flex align-items-center justify-content-center gap-2">
+              <i class="bi bi-cpu-fill"></i>
+              <span>Classify Legal Issue</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Loading Indicator Overlay/Spinner -->
+        <div id="loadingIndicator" class="d-none text-center py-4 mt-3 border-top border-cream">
+          <div class="spinner-border text-navy mb-2" role="status">
+            <span class="visually-hidden">Analyzing...</span>
+          </div>
+          <div class="fw-semibold text-navy">Analyzing legal facts & searching statutory knowledge base...</div>
+          <div class="small text-muted">Vectorizing query, evaluating category probabilities, and retrieving Indian legal frameworks</div>
+        </div>
+      </div>
+
+      <!-- Result Section (if classification result is present) -->
+      {% if result and result.success %}
+        <div class="jg-card result-box p-4 mb-4 shadow-sm">
+          <!-- Result Header -->
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 pb-3 mb-3 border-bottom border-cream">
+            <div>
+              <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                <span class="badge bg-navy text-cream px-3 py-2 fs-6">
+                  <i class="bi {{ result.icon }} me-1"></i> {{ result.category }}
+                </span>
+                {% if result.subcategory %}
+                  <span class="badge bg-cream text-navy border border-cream px-3 py-2 fs-6">
+                    <i class="bi bi-tag-fill me-1"></i> Subcategory: {{ result.subcategory }}
+                  </span>
+                {% endif %}
+              </div>
+              <h4 class="fw-bold mb-0 text-navy">Legal Assessment & Statutory Analysis</h4>
+            </div>
+
+            <div class="text-md-end">
+              <div class="small text-muted mb-1">
+                AI Confidence: <strong class="text-navy">{{ result.confidence }}%</strong>
+              </div>
+              <div class="confidence-bar" style="width: 140px;">
+                <div class="confidence-fill" style="width: {{ result.confidence }}%;"></div>
+              </div>
+              <small class="badge bg-cream text-navy border border-cream mt-2">{{ result.method_used }}</small>
+            </div>
+          </div>
+
+          <!-- Ambiguity / Low Confidence Alert -->
+          {% if result.is_ambiguous %}
+            <div class="alert alert-warning d-flex align-items-start gap-2 mb-4 rounded-3 border">
+              <i class="bi bi-question-diamond-fill fs-5 flex-shrink-0 mt-1 text-dark"></i>
+              <div>
+                <strong class="text-dark">Clarification Recommended:</strong>
+                <div class="text-dark">{{ result.ambiguity_reason or 'Your query contains multiple overlapping legal areas or broad facts.' }} To help identify the exact forum, consider these details:</div>
+                <ul class="mb-0 mt-1 small text-dark">
+                  {% for prompt in result.clarifying_prompts %}
+                    <li>{{ prompt }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Why Classified Section -->
+          <div class="mb-4 p-3 bg-cream-light rounded-3 border border-cream">
+            <h6 class="fw-bold text-navy mb-1">
+              <i class="bi bi-search text-navy me-2"></i>Why Classified in this Category:
+            </h6>
+            <p class="small text-navy mb-0">{{ result.why_classified }}</p>
+            <div class="small text-muted mt-1">{{ result.explanation }}</div>
+          </div>
+
+          <!-- General Informational Guidance -->
+          <div class="mb-4 p-3 bg-white rounded-3 border border-cream">
+            <h6 class="fw-bold text-navy mb-2">
+              <i class="bi bi-book-half text-navy me-2"></i>Legal Overview & Citizen Rights:
+            </h6>
+            <p class="small text-muted mb-0 leading-relaxed">{{ result.guidance }}</p>
+          </div>
+
+          <!-- Relevant Indian Statutory Frameworks & Sections -->
+          {% if result.relevant_laws %}
+            <div class="mb-4">
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <h6 class="fw-bold text-navy mb-0">
+                  <i class="bi bi-bank text-navy me-2"></i>Relevant Indian Laws & Statutory References:
+                </h6>
+                <small class="text-muted"><i class="bi bi-patch-check-fill text-navy me-1"></i>Official India Code References</small>
+              </div>
+
+              {% for law in result.relevant_laws %}
+                <div class="law-ref-card">
+                  <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-start gap-2 mb-2">
+                    <div>
+                      <div class="law-title">{{ law.law_name or law.act_name }}</div>
+                      <span class="badge bg-navy text-cream small">{{ law.jurisdiction or law.sections }}</span>
+                    </div>
+                    {% if law.official_reference_link or law.official_url %}
+                      <a href="{{ law.official_reference_link or law.official_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-jg-outline py-1 px-2 text-nowrap">
+                        <i class="bi bi-box-arrow-up-right me-1"></i> View on India Code
+                      </a>
+                    {% endif %}
+                  </div>
+                  <p class="small text-muted mb-2">{{ law.description or law.summary }}</p>
+                  <div class="d-flex justify-content-between align-items-center small text-muted border-top border-cream pt-1">
+                    <span>Source: <strong>{{ law.source_name or law.source }}</strong></span>
+                    <span>Verified: {{ law.last_verified_date or law.last_verified }}</span>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <!-- Required Documents & Next Steps (Two Columns) -->
+          <div class="row g-4 mb-4">
+            <div class="col-md-6">
+              <div class="p-3 border border-cream rounded-3 h-100 bg-white">
+                <h6 class="fw-bold text-navy mb-3">
+                  <i class="bi bi-folder-check text-navy me-2"></i>Important Documents to Organize:
+                </h6>
+                <ul class="list-unstyled small text-muted mb-0 d-flex flex-column gap-2">
+                  {% for doc in result.important_documents %}
+                    <li class="d-flex align-items-start gap-2">
+                      <i class="bi bi-check-circle-fill text-navy mt-1"></i>
+                      <span>{{ doc }}</span>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="p-3 border border-cream rounded-3 h-100 bg-white">
+                <h6 class="fw-bold text-navy mb-3">
+                  <i class="bi bi-arrow-right-circle text-navy me-2"></i>Suggested Immediate Next Steps:
+                </h6>
+                <ul class="list-unstyled small text-muted mb-0 d-flex flex-column gap-2">
+                  {% for step in result.suggested_next_steps %}
+                    <li class="d-flex align-items-start gap-2">
+                      <i class="bi bi-chevron-right text-navy mt-1"></i>
+                      <span>{{ step }}</span>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Official Curated Portals / Helplines -->
+          {% if result.official_resources %}
+            <div class="mb-4">
+              <h6 class="fw-bold text-navy mb-2"><i class="bi bi-telephone-outbound text-navy me-2"></i>Verified Public Helplines & Statutory Portals:</h6>
+              <div class="d-flex flex-wrap gap-2">
+                {% for res in result.official_resources %}
+                  <div class="p-2 px-3 border border-cream rounded-3 bg-white d-inline-flex align-items-center gap-2 small">
+                    <i class="bi bi-shield-check text-navy"></i>
+                    <span class="fw-semibold text-navy">{{ res.name }}</span>
+                    {% if res.helpline %}
+                      <span class="badge bg-navy text-cream">{{ res.helpline }}</span>
+                    {% endif %}
+                    {% if res.url %}
+                      <a href="{{ res.url }}" target="_blank" rel="noopener noreferrer" class="text-navy ms-1" title="Visit Portal">
+                        <i class="bi bi-box-arrow-up-right"></i>
+                      </a>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Feedback Mechanism -->
+          {% if query_record_id %}
+            <div id="feedbackContainer" class="pt-3 border-top border-cream d-flex align-items-center justify-content-between flex-wrap gap-2">
+              <span class="small text-muted">Was this legal categorization and guidance helpful?</span>
+              <div class="d-flex gap-2">
+                <button type="button" class="btn btn-jg-outline btn-sm btn-ai-feedback" data-query-id="{{ query_record_id }}" data-accurate="true">
+                  <i class="bi bi-hand-thumbs-up me-1"></i> Yes, Accurate
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm btn-ai-feedback" data-query-id="{{ query_record_id }}" data-accurate="false">
+                  <i class="bi bi-hand-thumbs-down me-1"></i> Needs Refinement
+                </button>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Matching Lawyers Section with Explicit Match Reasons -->
+        <div class="mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h4 class="fw-bold mb-0 text-navy">Recommended Advocates for this Category</h4>
+              <small class="text-muted">Ranked by category specialization, location relevance, and pro bono availability.</small>
+            </div>
+            <a href="{{ url_for('lawyers.directory', category=result.category) }}" class="btn btn-jg-outline btn-sm">
+              View All {{ result.category }} Advocates <i class="bi bi-chevron-right"></i>
+            </a>
+          </div>
+
+          <div class="row g-3">
+            {% for lawyer in matched_lawyers %}
+              <div class="col-md-6">
+                <div class="lawyer-card h-100">
+                  <div>
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                      <div class="d-flex align-items-center gap-2">
+                        <div class="lawyer-avatar">
+                          {{ lawyer.name[0] }}
+                        </div>
+                        <div>
+                          <h6 class="fw-bold mb-0 text-navy">{{ lawyer.name }}</h6>
+                          <small class="text-muted">{{ lawyer.qualification }}</small>
+                        </div>
+                      </div>
+                      <div class="d-flex flex-column align-items-end gap-1">
+                        <span class="badge-demo">Demo Profile</span>
+                        {% if lawyer.is_pro_bono %}
+                          <span class="badge-pro-bono"><i class="bi bi-heart-fill me-1"></i> Pro Bono</span>
+                        {% endif %}
+                      </div>
+                    </div>
+
+                    <div class="mb-2">
+                      <span class="badge bg-cream text-navy border border-cream fw-semibold">{{ lawyer.specialization }}</span>
+                      {% if lawyer.secondary_specialization %}
+                        <span class="badge bg-white text-navy border border-cream">{{ lawyer.secondary_specialization }}</span>
+                      {% endif %}
+                    </div>
+
+                    <!-- Explicit Match Reasons -->
+                    {% if lawyer.match_reasons %}
+                      <div class="p-2 bg-cream-light rounded-2 border border-cream mb-3">
+                        <div class="small fw-bold text-navy mb-1"><i class="bi bi-bullseye text-navy me-1"></i> Why Matched:</div>
+                        <ul class="match-reason-list mb-0">
+                          {% for reason in lawyer.match_reasons %}
+                            <li><i class="bi bi-check2 text-navy"></i> <span>{{ reason }}</span></li>
+                          {% endfor %}
+                        </ul>
+                      </div>
+                    {% endif %}
+
+                    <p class="small text-muted mb-2">{{ lawyer.bio|truncate(95) }}</p>
+
+                    <div class="small text-muted mb-3">
+                      <i class="bi bi-geo-alt me-1 text-navy"></i> {{ lawyer.city }}, {{ lawyer.state }} &bull; {{ lawyer.experience_years }} yrs exp
+                    </div>
+                  </div>
+
+                  <div class="d-flex justify-content-between align-items-center pt-2 border-top border-cream">
+                    <div>
+                      <small class="text-muted d-block">Consultation</small>
+                      <strong class="text-navy small">{{ lawyer.consultation_fee_amount }}</strong>
+                    </div>
+                    <a href="{{ url_for('lawyers.detail', lawyer_id=lawyer.id) }}" class="btn btn-jg-outline btn-sm">
+                      Consult Advocate
+                    </a>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Matching Free Legal Aid Clinics -->
+        <div class="mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h4 class="fw-bold mb-0 text-navy">Free Legal Aid & Government Clinics</h4>
+              <small class="text-muted">Statutory support authorities providing free counseling under Section 12 LSA Act.</small>
+            </div>
+            <a href="{{ url_for('legal_aid.directory', category=result.category) }}" class="btn btn-jg-outline btn-sm">
+              Browse All Aid Centers <i class="bi bi-chevron-right"></i>
+            </a>
+          </div>
+
+          <div class="row g-3">
+            {% for aid in matched_aid %}
+              <div class="col-md-4">
+                <div class="jg-card p-3 h-100 d-flex flex-column justify-content-between">
+                  <div>
+                    <span class="badge bg-cream text-navy border border-cream mb-2">{{ aid.organization_type }}</span>
+                    <h6 class="fw-bold mb-1 text-navy">{{ aid.name }}</h6>
+                    <small class="text-muted d-block mb-2">{{ aid.city or 'National' }}, {{ aid.state }}</small>
+                    <p class="small text-muted mb-2">{{ aid.services_offered|truncate(80) }}</p>
+                  </div>
+                  <div class="pt-2 border-top border-cream d-flex justify-content-between align-items-center">
+                    <strong class="text-navy small">{{ aid.helpline_number or aid.phone or 'Walk-in Desk' }}</strong>
+                    <a href="{{ url_for('legal_aid.directory') }}" class="btn btn-jg-outline btn-sm py-1 px-2">Details</a>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/assistant.js') }}"></script>
+{% endblock %}

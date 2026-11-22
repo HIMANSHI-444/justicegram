@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block title %}Find Lawyers & Advocates — {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Page Header -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
+    <div>
+      <h1 class="fw-bold mb-1">Lawyer Directory</h1>
+      <p class="text-muted mb-0">Search demonstration advocate profiles, filter by specialization and city, or discover pro bono legal support.</p>
+    </div>
+    <div class="d-flex gap-2">
+      <span class="badge bg-white text-navy border border-cream p-2 px-3 d-inline-flex align-items-center">
+        <strong class="text-navy me-1">{{ lawyers|length }}</strong> Advocates Seeded
+      </span>
+    </div>
+  </div>
+
+  <!-- Academic Demo Transparency Notice Banner -->
+  <div class="jg-transparency-banner d-flex align-items-center gap-3">
+    <i class="bi bi-info-circle-fill text-navy fs-4 flex-shrink-0"></i>
+    <div>
+      <strong>Demonstration Notice:</strong> These lawyer profiles are fictional sample records created for academic demonstration purposes. They do not represent real lawyers or provide actual legal services.
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Sidebar Filters -->
+    <div class="col-lg-3">
+      <div class="jg-card p-3 sticky-top" style="top: 85px;">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0"><i class="bi bi-funnel me-1 text-teal"></i> Filters</h5>
+          <a href="{{ url_for('lawyers.directory') }}" class="small text-muted text-decoration-none">Reset All</a>
+        </div>
+
+        <form method="GET" action="{{ url_for('lawyers.directory') }}">
+          <!-- Keyword Search -->
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Keyword Search</label>
+            <input type="text" name="q" class="form-control form-control-sm" placeholder="Name or keyword..." value="{{ search_keyword }}">
+          </div>
+
+          <!-- Legal Category -->
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Legal Specialization</label>
+            <select name="category" class="form-select form-select-sm">
+              <option value="">All Categories</option>
+              {% for cat_name in categories.keys() %}
+                {% if cat_name != 'Other / Needs Clarification' %}
+                  <option value="{{ cat_name }}" {% if selected_category == cat_name %}selected{% endif %}>
+                    {{ cat_name }}
+                  </option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Location / City -->
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">City</label>
+            <select name="city" class="form-select form-select-sm">
+              <option value="">All Cities</option>
+              {% for city in all_cities %}
+                <option value="{{ city }}" {% if selected_city == city %}selected{% endif %}>{{ city }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Language -->
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Language Spoken</label>
+            <select name="language" class="form-select form-select-sm">
+              <option value="">Any Language</option>
+              {% for lang in all_languages %}
+                <option value="{{ lang }}" {% if selected_language == lang %}selected{% endif %}>{{ lang }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Minimum Experience -->
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Min Experience</label>
+            <select name="experience" class="form-select form-select-sm">
+              <option value="">Any Experience</option>
+              <option value="3" {% if min_experience == '3' %}selected{% endif %}>3+ Years</option>
+              <option value="5" {% if min_experience == '5' %}selected{% endif %}>5+ Years</option>
+              <option value="10" {% if min_experience == '10' %}selected{% endif %}>10+ Years</option>
+            </select>
+          </div>
+
+          <!-- Pro Bono Checkbox -->
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" name="pro_bono" value="1" id="proBonoCheck" {% if pro_bono_only %}checked{% endif %}>
+            <label class="form-check-label small" for="proBonoCheck">
+              Pro Bono (Free Support)
+            </label>
+          </div>
+
+          <!-- Verified Checkbox -->
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" name="verified" value="1" id="verifiedCheck" {% if verified_only %}checked{% endif %}>
+            <label class="form-check-label small" for="verifiedCheck">
+              Admin Verified Only
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn-jg-primary btn-sm w-100">
+            Apply Filters
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Main Results Grid -->
+    <div class="col-lg-9">
+      <!-- Sorting Header -->
+      <div class="d-flex justify-content-between align-items-center mb-3 bg-white p-2 px-3 rounded-3 border">
+        <span class="small text-muted">Showing <strong>{{ lawyers|length }}</strong> results</span>
+        <div class="d-flex align-items-center gap-2">
+          <small class="text-muted text-nowrap">Sort By:</small>
+          <form method="GET" action="{{ url_for('lawyers.directory') }}" class="d-inline">
+            <input type="hidden" name="category" value="{{ selected_category }}">
+            <input type="hidden" name="city" value="{{ selected_city }}">
+            <input type="hidden" name="language" value="{{ selected_language }}">
+            <input type="hidden" name="q" value="{{ search_keyword }}">
+            {% if pro_bono_only %}<input type="hidden" name="pro_bono" value="1">{% endif %}
+            {% if verified_only %}<input type="hidden" name="verified" value="1">{% endif %}
+            <select name="sort" class="form-select form-select-sm" onchange="this.form.submit()">
+              <option value="rating_desc" {% if sort_by == 'rating_desc' %}selected{% endif %}>Top Rated & Pro Bono</option>
+              <option value="exp_desc" {% if sort_by == 'exp_desc' %}selected{% endif %}>Experience (Highest First)</option>
+              <option value="exp_asc" {% if sort_by == 'exp_asc' %}selected{% endif %}>Experience (Lowest First)</option>
+              <option value="name_asc" {% if sort_by == 'name_asc' %}selected{% endif %}>Name (A to Z)</option>
+            </select>
+          </form>
+        </div>
+      </div>
+
+      <!-- Lawyers List -->
+      {% if lawyers %}
+        <div class="row g-3">
+          {% for lawyer in lawyers %}
+            <div class="col-md-6">
+              <div class="lawyer-card h-100">
+                <div>
+                  <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="lawyer-avatar">
+                        {{ lawyer.name[0] }}
+                      </div>
+                      <div>
+                        <h6 class="fw-bold mb-0">{{ lawyer.name }}</h6>
+                        <small class="text-muted">{{ lawyer.qualification }}</small>
+                      </div>
+                    </div>
+
+                    <div class="d-flex flex-column align-items-end gap-1">
+                      {% if lawyer.is_verified %}
+                        <span class="badge-verified"><i class="bi bi-patch-check-fill"></i> Verified</span>
+                      {% else %}
+                        <span class="badge-demo">Demo Profile</span>
+                      {% endif %}
+                      {% if lawyer.is_pro_bono %}
+                        <span class="badge-pro-bono"><i class="bi bi-heart-fill"></i> Pro Bono</span>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  <div class="mb-2">
+                    <span class="badge bg-cream text-navy fw-semibold border border-cream">{{ lawyer.specialization }}</span>
+                    {% if lawyer.secondary_specialization %}
+                      <span class="badge bg-white text-navy border border-cream">{{ lawyer.secondary_specialization }}</span>
+                    {% endif %}
+                  </div>
+
+                  <p class="small text-muted mb-3">{{ lawyer.bio|truncate(120) }}</p>
+
+                  <div class="small text-muted mb-1">
+                    <i class="bi bi-geo-alt me-1 text-navy"></i> {{ lawyer.city }}, {{ lawyer.state }}
+                  </div>
+                  <div class="small text-muted mb-1">
+                    <i class="bi bi-briefcase me-1 text-navy"></i> {{ lawyer.experience_years }} Years Practical Experience
+                  </div>
+                  <div class="small text-muted mb-3">
+                    <i class="bi bi-translate me-1 text-navy"></i> {{ lawyer.languages_spoken }}
+                  </div>
+                </div>
+
+                <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                  <div>
+                    <small class="text-muted d-block">Consultation</small>
+                    <strong class="text-dark small">{{ lawyer.consultation_fee_amount }}</strong>
+                  </div>
+                  <div class="d-flex gap-2">
+                    {% if current_user %}
+                      <button 
+                        class="btn btn-sm btn-bookmark-toggle {% if lawyer.id in bookmarked_ids %}btn-primary{% else %}btn-jg-outline{% endif %}"
+                        data-url="{{ url_for('lawyers.toggle_bookmark', lawyer_id=lawyer.id) }}"
+                        title="Save to bookmarks">
+                        <i class="bi {% if lawyer.id in bookmarked_ids %}bi-bookmark-fill{% else %}bi-bookmark{% endif %}"></i>
+                      </button>
+                    {% endif %}
+                    <a href="{{ url_for('lawyers.detail', lawyer_id=lawyer.id) }}" class="btn btn-jg-primary btn-sm">
+                      View Profile
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <!-- Empty State -->
+        <div class="jg-card p-5 text-center">
+          <i class="bi bi-search text-muted fs-1 mb-3"></i>
+          <h5 class="fw-bold">No lawyers match your selected criteria</h5>
+          <p class="text-muted small mb-3">Try clearing some of your filters or searching with broader keywords.</p>
+          <a href="{{ url_for('lawyers.directory') }}" class="btn btn-jg-outline btn-sm">Clear All Filters</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

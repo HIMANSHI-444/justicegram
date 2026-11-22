@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+
+{% block title %}User Dashboard — {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- User Greeting Banner -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 p-4 rounded-4 bg-white border shadow-sm">
+    <div class="d-flex align-items-center gap-3">
+      <div class="lawyer-avatar fs-2" style="width: 60px; height: 60px; background: linear-gradient(135deg, #0d9488, #1c2541);">
+        {{ current_user.name[0] }}
+      </div>
+      <div>
+        <h3 class="fw-bold mb-0">Welcome, {{ current_user.name }}</h3>
+        <small class="text-muted">{{ current_user.email }} &bull; Member since {{ current_user.created_at.strftime('%B %Y') if current_user.created_at else '2026' }}</small>
+      </div>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('assistant.assistant') }}" class="btn btn-jg-primary btn-sm">
+        <i class="bi bi-stars me-1"></i> New Legal Query
+      </a>
+      {% if current_user.is_admin %}
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-danger btn-sm">
+          <i class="bi bi-shield-lock me-1"></i> Admin Panel
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Metric Overview Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+      <div class="stat-card d-flex align-items-center gap-3">
+        <div class="stat-icon bg-teal-soft text-teal">
+          <i class="bi bi-cpu-fill"></i>
+        </div>
+        <div>
+          <div class="fs-4 fw-bold text-navy">{{ stats.total_queries }}</div>
+          <small class="text-muted">Legal Queries Run</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="stat-card d-flex align-items-center gap-3">
+        <div class="stat-icon bg-primary-subtle text-primary">
+          <i class="bi bi-chat-left-text-fill"></i>
+        </div>
+        <div>
+          <div class="fs-4 fw-bold text-navy">{{ stats.total_inquiries }}</div>
+          <small class="text-muted">Inquiries Sent</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="stat-card d-flex align-items-center gap-3">
+        <div class="stat-icon bg-warning-subtle text-warning">
+          <i class="bi bi-person-badge-fill"></i>
+        </div>
+        <div>
+          <div class="fs-4 fw-bold text-navy">{{ stats.saved_lawyers_count }}</div>
+          <small class="text-muted">Saved Lawyers</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="stat-card d-flex align-items-center gap-3">
+        <div class="stat-icon bg-success-subtle text-success">
+          <i class="bi bi-heart-pulse-fill"></i>
+        </div>
+        <div>
+          <div class="fs-4 fw-bold text-navy">{{ stats.saved_aid_count }}</div>
+          <small class="text-muted">Saved Legal Aid</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nav Tabs -->
+  <ul class="nav nav-tabs mb-4 border-bottom" id="dashboardTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active fw-semibold" id="queries-tab" data-bs-toggle="tab" data-bs-target="#queries-pane" type="button" role="tab">
+        <i class="bi bi-clock-history me-1"></i> My AI Query History
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link fw-semibold" id="inquiries-tab" data-bs-toggle="tab" data-bs-target="#inquiries-pane" type="button" role="tab">
+        <i class="bi bi-send me-1"></i> Consultation Requests
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link fw-semibold" id="bookmarks-tab" data-bs-toggle="tab" data-bs-target="#bookmarks-pane" type="button" role="tab">
+        <i class="bi bi-bookmark-star me-1"></i> Saved Resources
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link fw-semibold" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-pane" type="button" role="tab">
+        <i class="bi bi-gear me-1"></i> Profile & Security
+      </button>
+    </li>
+  </ul>
+
+  <!-- Tab Contents -->
+  <div class="tab-content" id="dashboardTabContent">
+    <!-- Pane 1: Query History -->
+    <div class="tab-pane fade show active" id="queries-pane" role="tabpanel">
+      {% if queries %}
+        <div class="d-flex flex-column gap-3">
+          {% for q in queries %}
+            <div class="jg-card p-4">
+              <div class="d-flex justify-content-between align-items-start mb-2 flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="badge bg-teal-soft text-teal fs-6 px-3 py-1">{{ q.predicted_category }}</span>
+                  <span class="badge bg-light text-muted border">Confidence: {{ q.confidence_score }}%</span>
+                  {% if q.is_ambiguous %}
+                    <span class="badge bg-warning text-dark"><i class="bi bi-question-circle me-1"></i> Needed Clarification</span>
+                  {% endif %}
+                </div>
+                <small class="text-muted">{{ q.created_at.strftime('%d %b %Y, %I:%M %p') if q.created_at else '' }}</small>
+              </div>
+
+              <p class="text-muted small mb-3 fst-italic">"{{ q.query_text }}"</p>
+
+              <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                <a href="{{ url_for('assistant.assistant', q=q.query_text) }}" class="btn btn-jg-outline btn-sm">
+                  <i class="bi bi-arrow-repeat me-1"></i> Re-Analyze Case
+                </a>
+                <a href="{{ url_for('lawyers.directory', category=q.predicted_category) }}" class="small text-teal text-decoration-none">
+                  Find {{ q.predicted_category }} Lawyers <i class="bi bi-chevron-right"></i>
+                </a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="jg-card p-5 text-center">
+          <i class="bi bi-chat-square-text text-muted fs-1 mb-3"></i>
+          <h5 class="fw-bold">No legal queries run yet</h5>
+          <p class="text-muted small mb-3">Describe your legal problem in plain English or Hinglish to see your analysis history here.</p>
+          <a href="{{ url_for('assistant.assistant') }}" class="btn btn-jg-primary btn-sm">Ask AI Assistant</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Pane 2: Consultation Inquiries -->
+    <div class="tab-pane fade" id="inquiries-pane" role="tabpanel">
+      {% if inquiries %}
+        <div class="table-responsive bg-white rounded-3 border">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr class="small text-muted">
+                <th>Date</th>
+                <th>Lawyer</th>
+                <th>Subject</th>
+                <th>Category</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for inq in inquiries %}
+                <tr>
+                  <td class="small text-muted">{{ inq.created_at.strftime('%d %b %Y') if inq.created_at else '' }}</td>
+                  <td>
+                    <strong>Advocate {{ inq.lawyer.name }}</strong>
+                    <small class="d-block text-muted">{{ inq.lawyer.city }}</small>
+                  </td>
+                  <td>
+                    <div class="fw-semibold">{{ inq.subject }}</div>
+                    <small class="text-muted text-truncate d-inline-block" style="max-width: 250px;">{{ inq.message }}</small>
+                  </td>
+                  <td><span class="badge bg-teal-soft text-teal">{{ inq.legal_category }}</span></td>
+                  <td>
+                    {% if inq.status == 'Pending' %}
+                      <span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split me-1"></i> Pending</span>
+                    {% elif inq.status == 'Contacted' %}
+                      <span class="badge bg-primary"><i class="bi bi-telephone-outbound me-1"></i> Contacted</span>
+                    {% elif inq.status == 'Resolved' %}
+                      <span class="badge bg-success"><i class="bi bi-check2-circle me-1"></i> Resolved</span>
+                    {% else %}
+                      <span class="badge bg-secondary">{{ inq.status }}</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="jg-card p-5 text-center">
+          <i class="bi bi-envelope-open text-muted fs-1 mb-3"></i>
+          <h5 class="fw-bold">No consultation inquiries submitted</h5>
+          <p class="text-muted small mb-3">When you send a consultation inquiry to an advocate, you can track their response here.</p>
+          <a href="{{ url_for('lawyers.directory') }}" class="btn btn-jg-outline btn-sm">Browse Lawyer Directory</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Pane 3: Saved Bookmarks -->
+    <div class="tab-pane fade" id="bookmarks-pane" role="tabpanel">
+      <div class="row g-4">
+        <!-- Saved Lawyers -->
+        <div class="col-lg-6">
+          <h5 class="fw-bold mb-3"><i class="bi bi-person-badge text-teal me-2"></i>Saved Lawyers ({{ saved_lawyers|length }})</h5>
+          {% if saved_lawyers %}
+            <div class="d-flex flex-column gap-3">
+              {% for l in saved_lawyers %}
+                <div class="jg-card p-3 d-flex justify-content-between align-items-center">
+                  <div>
+                    <h6 class="fw-bold mb-1">{{ l.name }}</h6>
+                    <small class="text-teal d-block mb-1">{{ l.specialization }} &bull; {{ l.city }}</small>
+                    <small class="text-muted">{{ l.consultation_fee_amount }}</small>
+                  </div>
+                  <div class="d-flex gap-2">
+                    <a href="{{ url_for('lawyers.detail', lawyer_id=l.id) }}" class="btn btn-jg-outline btn-sm">View</a>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="p-4 bg-light rounded-3 text-center text-muted small">
+              No saved lawyers yet. Click the bookmark icon on any lawyer profile to save it here.
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Saved Legal Aid Centers -->
+        <div class="col-lg-6">
+          <h5 class="fw-bold mb-3"><i class="bi bi-heart-fill text-danger me-2"></i>Saved Legal Aid Centers ({{ saved_aid|length }})</h5>
+          {% if saved_aid %}
+            <div class="d-flex flex-column gap-3">
+              {% for a in saved_aid %}
+                <div class="jg-card p-3 d-flex justify-content-between align-items-center">
+                  <div>
+                    <span class="badge bg-teal-soft mb-1">{{ a.organization_type }}</span>
+                    <h6 class="fw-bold mb-1">{{ a.name }}</h6>
+                    <small class="text-muted d-block">{{ a.city or 'National' }}, {{ a.state }}</small>
+                  </div>
+                  <div class="d-flex gap-2">
+                    <a href="{{ url_for('legal_aid.directory') }}" class="btn btn-jg-outline btn-sm">Details</a>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="p-4 bg-light rounded-3 text-center text-muted small">
+              No saved legal aid resources yet. Browse free legal aid centers and bookmark them for quick reference.
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Pane 4: Profile & Password -->
+    <div class="tab-pane fade" id="profile-pane" role="tabpanel">
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="jg-card p-4">
+            <h5 class="fw-bold mb-3">Update Personal Details</h5>
+            <form action="{{ url_for('user.update_profile') }}" method="POST">
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Full Name</label>
+                <input type="text" name="name" class="form-control form-control-sm" value="{{ current_user.name }}" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Email Address (Read-only)</label>
+                <input type="email" class="form-control form-control-sm bg-light" value="{{ current_user.email }}" readonly>
+              </div>
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Phone Number</label>
+                <input type="tel" name="phone" class="form-control form-control-sm" value="{{ current_user.phone or '' }}" placeholder="Mobile number">
+              </div>
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">City</label>
+                <input type="text" name="city" class="form-control form-control-sm" value="{{ current_user.city or '' }}" placeholder="City">
+              </div>
+              <button type="submit" class="btn btn-jg-primary btn-sm">Save Changes</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="jg-card p-4">
+            <h5 class="fw-bold mb-3">Change Password</h5>
+            <form action="{{ url_for('user.change_password') }}" method="POST">
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Current Password</label>
+                <input type="password" name="current_password" class="form-control form-control-sm" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">New Password (Min. 6 chars)</label>
+                <input type="password" name="new_password" class="form-control form-control-sm" minlength="6" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Confirm New Password</label>
+                <input type="password" name="confirm_password" class="form-control form-control-sm" required>
+              </div>
+              <button type="submit" class="btn btn-jg-navy btn-sm">Update Password</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}Advocate {{ lawyer.name }} — {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb small">
+      <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}" class="text-teal text-decoration-none">Home</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('lawyers.directory') }}" class="text-teal text-decoration-none">Lawyers</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ lawyer.name }}</li>
+    </ol>
+  </nav>
+
+  <div class="row g-4">
+    <!-- Main Profile Info -->
+    <div class="col-lg-8">
+      <div class="jg-card p-4 mb-4">
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-start gap-3 pb-4 mb-4 border-bottom">
+          <div class="d-flex align-items-center gap-3">
+            <div class="lawyer-avatar fs-2" style="width: 72px; height: 72px;">
+              {{ lawyer.name[0] }}
+            </div>
+            <div>
+              <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                <h3 class="fw-bold mb-0">{{ lawyer.name }}</h3>
+                {% if lawyer.is_verified %}
+                  <span class="badge-verified"><i class="bi bi-patch-check-fill me-1"></i> Verified</span>
+                {% else %}
+                  <span class="badge-demo">Demo Profile</span>
+                {% endif %}
+                {% if lawyer.is_pro_bono %}
+                  <span class="badge-pro-bono"><i class="bi bi-heart-fill me-1"></i> Pro Bono Available</span>
+                {% endif %}
+              </div>
+              <div class="text-muted small mb-1">{{ lawyer.qualification }}</div>
+              <div class="d-flex align-items-center gap-3 small text-muted">
+                <span><i class="bi bi-geo-alt me-1 text-teal"></i> {{ lawyer.city }}, {{ lawyer.state }}</span>
+                <span><i class="bi bi-briefcase me-1 text-teal"></i> {{ lawyer.experience_years }} Years Practice</span>
+              </div>
+            </div>
+          </div>
+
+          {% if current_user %}
+            <button 
+              class="btn btn-sm btn-bookmark-toggle {% if is_bookmarked %}btn-primary{% else %}btn-jg-outline{% endif %}"
+              data-url="{{ url_for('lawyers.toggle_bookmark', lawyer_id=lawyer.id) }}">
+              <i class="bi {% if is_bookmarked %}bi-bookmark-fill{% else %}bi-bookmark{% endif %} me-1"></i>
+              <span class="bookmark-text">{% if is_bookmarked %}Saved{% else %}Save Profile{% endif %}</span>
+            </button>
+          {% endif %}
+        </div>
+
+        <!-- Specializations -->
+        <div class="mb-4">
+          <h6 class="fw-bold text-navy mb-2">Practice Areas:</h6>
+          <div class="d-flex flex-wrap gap-2">
+            <span class="badge bg-teal-soft fs-6 px-3 py-2 text-teal">{{ lawyer.specialization }}</span>
+            {% if lawyer.secondary_specialization %}
+              <span class="badge bg-light text-dark border fs-6 px-3 py-2">{{ lawyer.secondary_specialization }}</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Professional Biography -->
+        <div class="mb-4">
+          <h6 class="fw-bold text-navy mb-2">Professional Biography:</h6>
+          <p class="text-muted leading-relaxed" style="white-space: pre-line;">{{ lawyer.bio }}</p>
+        </div>
+
+        <!-- Languages & Bar Registration -->
+        <div class="row g-3 p-3 bg-light rounded-3 mb-4">
+          <div class="col-sm-6">
+            <small class="text-muted d-block">Languages Spoken:</small>
+            <div class="fw-semibold">{{ lawyer.languages_spoken }}</div>
+          </div>
+          <div class="col-sm-6">
+            <small class="text-muted d-block">Bar Council Registration (Demo):</small>
+            <div class="fw-semibold">{{ lawyer.bar_council_reg_number or 'Verification in Progress' }}</div>
+          </div>
+        </div>
+
+        <!-- Important Demo Disclaimer -->
+        <div class="alert alert-info py-2 px-3 small mb-0 rounded-3">
+          <i class="bi bi-info-circle-fill me-1"></i>
+          <strong>Academic Demo Notice:</strong> This profile is an illustrative demonstration record for college evaluation. In a live system, advocates undergo Bar Council verification prior to displaying direct contact details.
+        </div>
+      </div>
+
+      <!-- Similar Lawyers in Same Area -->
+      {% if similar_lawyers %}
+        <div class="mb-4">
+          <h5 class="fw-bold mb-3">Other Practitioners in {{ lawyer.specialization }}</h5>
+          <div class="row g-3">
+            {% for sim in similar_lawyers %}
+              <div class="col-md-6">
+                <div class="jg-card p-3 h-100">
+                  <h6 class="fw-bold mb-1">{{ sim.name }}</h6>
+                  <small class="text-teal d-block mb-2">{{ sim.city }} &bull; {{ sim.experience_years }} yrs exp</small>
+                  <a href="{{ url_for('lawyers.detail', lawyer_id=sim.id) }}" class="btn btn-jg-outline btn-sm">View Profile</a>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Inquiry / Booking Side Form -->
+    <div class="col-lg-4">
+      <div class="jg-card p-4 sticky-top" style="top: 85px;">
+        <h5 class="fw-bold mb-1">Request a Consultation</h5>
+        <p class="small text-muted mb-3">Send an inquiry regarding your legal issue directly to Advocate {{ lawyer.name }}.</p>
+
+        <div class="p-3 bg-light rounded-3 mb-3">
+          <div class="d-flex justify-content-between mb-1">
+            <span class="small text-muted">Consultation Type:</span>
+            <span class="fw-bold small">{{ lawyer.consultation_fee_type }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="small text-muted">Consultation Fee:</span>
+            <span class="fw-bold text-teal">{{ lawyer.consultation_fee_amount }}</span>
+          </div>
+        </div>
+
+        {% if current_user %}
+          <form action="{{ url_for('lawyers.submit_inquiry', lawyer_id=lawyer.id) }}" method="POST">
+            <input type="hidden" name="legal_category" value="{{ lawyer.specialization }}">
+
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">Subject / Short Title</label>
+              <input type="text" name="subject" class="form-control form-control-sm" placeholder="E.g., Legal notice for security deposit" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">Contact Phone Number</label>
+              <input type="tel" name="phone" class="form-control form-control-sm" placeholder="Your mobile number" value="{{ current_user.phone or '' }}" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">Preferred Contact Time</label>
+              <select name="preferred_contact_time" class="form-select form-select-sm">
+                <option value="Morning (10am - 1pm)">Morning (10am - 1pm)</option>
+                <option value="Afternoon (1pm - 5pm)">Afternoon (1pm - 5pm)</option>
+                <option value="Evening (5pm - 8pm)">Evening (5pm - 8pm)</option>
+                <option value="Weekend">Weekend</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">Brief Summary of Your Issue</label>
+              <textarea name="message" class="form-control form-control-sm" rows="4" placeholder="Mention key dates, agreements, or specific questions..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-jg-primary w-100 py-2">
+              <i class="bi bi-send me-1"></i> Send Inquiry
+            </button>
+          </form>
+        {% else %}
+          <div class="text-center py-3">
+            <i class="bi bi-shield-lock text-muted fs-3 mb-2 d-block"></i>
+            <p class="small text-muted mb-3">Please sign in to your free account to send direct consultation inquiries.</p>
+            <a href="{{ url_for('auth.login', next=request.url) }}" class="btn btn-jg-primary w-100 mb-2">Sign In to Inquire</a>
+            <a href="{{ url_for('auth.register') }}" class="btn btn-jg-outline w-100 btn-sm">Create Free Account</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

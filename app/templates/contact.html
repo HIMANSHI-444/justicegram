@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Us — {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-7">
+      <div class="jg-card p-4 p-md-5 shadow-sm">
+        <div class="text-center mb-4">
+          <div class="jg-brand-icon mx-auto mb-3" style="width: 48px; height: 48px; font-size: 1.5rem;">
+            <i class="bi bi-envelope-paper"></i>
+          </div>
+          <h2 class="fw-bold mb-1">Get in Touch</h2>
+          <p class="text-muted small">Have feedback on our AI classification model or wish to register your university legal aid cell? Send us a message.</p>
+        </div>
+
+        <form action="{{ url_for('main.contact') }}" method="POST">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Your Name *</label>
+            <input type="text" name="name" class="form-control" placeholder="Full name" value="{{ current_user.name if current_user else '' }}" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Email Address *</label>
+            <input type="email" name="email" class="form-control" placeholder="name@example.com" value="{{ current_user.email if current_user else '' }}" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Subject</label>
+            <input type="text" name="subject" class="form-control" placeholder="E.g., Legal Aid Clinic Partnership or Feedback" required>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label small fw-semibold">Message *</label>
+            <textarea name="message" class="form-control" rows="5" placeholder="Share your message, feedback, or inquiry..." required></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-jg-primary w-100 py-2">
+            <i class="bi bi-send me-1"></i> Send Message
+          </button>
+        </form>
+
+        <div class="mt-4 pt-4 border-top text-center small text-muted">
+          <div><i class="bi bi-geo-alt text-teal me-1"></i> Academic BCA Mini-Project &bull; Computer Applications Department</div>
+          <div><i class="bi bi-envelope text-teal me-1"></i> contact@justicegram.org</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

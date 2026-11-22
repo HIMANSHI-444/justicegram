@@ -1,0 +1,634 @@
+/* ==========================================================================
+   JUSTICEGRAM — AI-Powered Legal Assistance Platform
+   Public Palette: Strictly Deep Navy (#142133) and Cream (#F4EDE0)
+   Academic Demonstration Platform
+   ========================================================================== */
+
+:root {
+  /* Strictly Navy & Cream Palette */
+  --jg-navy: #142133;
+  --jg-navy-dark: #0B131E;
+  --jg-navy-light: #1D2F47;
+  --jg-cream: #F4EDE0;
+  --jg-cream-light: #FAF7F2;
+  --jg-cream-soft: #FDFBF7;
+  --jg-cream-border: #E5DAC8;
+  --jg-cream-hover: #ECE2D0;
+  
+  /* Text & Utility */
+  --jg-text-main: #142133;
+  --jg-text-muted: #5A6578;
+  --jg-gray-bg: #FAF7F2;
+  --jg-gray-border: #E5DAC8;
+  --jg-card-shadow: 0 4px 6px -1px rgba(20, 33, 51, 0.06), 0 2px 4px -2px rgba(20, 33, 51, 0.04);
+  --jg-card-shadow-hover: 0 10px 18px -3px rgba(20, 33, 51, 0.12), 0 4px 6px -4px rgba(20, 33, 51, 0.06);
+  --jg-radius: 12px;
+  --jg-transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: var(--jg-text-main);
+  background-color: var(--jg-gray-bg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+/* ==========================================================================
+   Typography & Utilities
+   ========================================================================== */
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--jg-navy);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.text-navy {
+  color: var(--jg-navy) !important;
+}
+
+.text-cream {
+  color: var(--jg-cream) !important;
+}
+
+.bg-navy {
+  background-color: var(--jg-navy) !important;
+  color: var(--jg-cream) !important;
+}
+
+.bg-navy-dark {
+  background-color: var(--jg-navy-dark) !important;
+  color: var(--jg-cream) !important;
+}
+
+.bg-cream {
+  background-color: var(--jg-cream) !important;
+  color: var(--jg-navy) !important;
+}
+
+.bg-cream-light {
+  background-color: var(--jg-cream-light) !important;
+  color: var(--jg-navy) !important;
+}
+
+.border-cream {
+  border-color: var(--jg-cream-border) !important;
+}
+
+/* ==========================================================================
+   Public Navbar (Strictly Navy #142133 Background with Cream #F4EDE0 Accents)
+   ========================================================================== */
+
+.jg-navbar {
+  background-color: var(--jg-navy);
+  border-bottom: 1.5px solid rgba(244, 237, 224, 0.2);
+  box-shadow: 0 2px 10px rgba(11, 19, 30, 0.25);
+  padding: 0.8rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+}
+
+/* JusticeGram Brand Logo - Exact Mark Preserved */
+.jg-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-decoration: none;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--jg-cream);
+  letter-spacing: -0.03em;
+}
+
+.jg-brand:hover {
+  color: #FFFFFF;
+}
+
+.jg-brand-icon {
+  width: 38px;
+  height: 38px;
+  background-color: var(--jg-navy-dark);
+  border: 1.5px solid var(--jg-cream);
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--jg-cream);
+  font-size: 1.2rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.jg-brand span {
+  color: var(--jg-cream);
+  opacity: 0.9;
+}
+
+.jg-navbar .nav-link {
+  font-weight: 500;
+  color: var(--jg-cream) !important;
+  padding: 0.5rem 0.9rem !important;
+  border-radius: 8px;
+  transition: var(--jg-transition);
+}
+
+.jg-navbar .nav-link:hover, 
+.jg-navbar .nav-link.active {
+  color: var(--jg-navy) !important;
+  background-color: var(--jg-cream) !important;
+}
+
+.jg-navbar .dropdown-menu {
+  background-color: #FFFFFF;
+  border: 1px solid var(--jg-cream-border);
+  box-shadow: 0 8px 24px rgba(20, 33, 51, 0.12);
+}
+
+.jg-navbar .dropdown-item {
+  color: var(--jg-navy);
+  font-weight: 500;
+}
+
+.jg-navbar .dropdown-item:hover {
+  background-color: var(--jg-cream-light);
+  color: var(--jg-navy);
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+
+.btn-jg-primary {
+  background-color: var(--jg-navy);
+  color: var(--jg-cream);
+  border: 1.5px solid var(--jg-navy);
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 0.6rem 1.35rem;
+  transition: var(--jg-transition);
+}
+
+.btn-jg-primary:hover {
+  background-color: var(--jg-navy-dark);
+  border-color: var(--jg-navy-dark);
+  color: #FFFFFF;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(20, 33, 51, 0.2);
+}
+
+.btn-jg-cream {
+  background-color: var(--jg-cream);
+  color: var(--jg-navy);
+  border: 1.5px solid var(--jg-cream);
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 0.6rem 1.35rem;
+  transition: var(--jg-transition);
+}
+
+.btn-jg-cream:hover {
+  background-color: var(--jg-cream-hover);
+  border-color: var(--jg-cream-border);
+  color: var(--jg-navy-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.btn-jg-navy {
+  background-color: var(--jg-navy);
+  color: var(--jg-cream);
+  border: 1px solid var(--jg-navy);
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 0.6rem 1.35rem;
+  transition: var(--jg-transition);
+}
+
+.btn-jg-navy:hover {
+  background-color: var(--jg-navy-dark);
+  border-color: var(--jg-navy-dark);
+  color: #FFFFFF;
+  transform: translateY(-1px);
+}
+
+.btn-jg-outline {
+  border: 1.5px solid var(--jg-navy);
+  background-color: transparent;
+  color: var(--jg-navy);
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 0.55rem 1.25rem;
+  transition: var(--jg-transition);
+}
+
+.btn-jg-outline:hover {
+  border-color: var(--jg-navy);
+  color: var(--jg-cream);
+  background-color: var(--jg-navy);
+}
+
+.btn-jg-outline-cream {
+  border: 1.5px solid var(--jg-cream);
+  background-color: transparent;
+  color: var(--jg-cream);
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 0.55rem 1.25rem;
+  transition: var(--jg-transition);
+}
+
+.btn-jg-outline-cream:hover {
+  background-color: var(--jg-cream);
+  color: var(--jg-navy);
+}
+
+/* ==========================================================================
+   Cards & Layout Components
+   ========================================================================== */
+
+.jg-card {
+  background: #FFFFFF;
+  border-radius: var(--jg-radius);
+  border: 1.5px solid var(--jg-cream-border);
+  box-shadow: var(--jg-card-shadow);
+  transition: var(--jg-transition);
+}
+
+.jg-card:hover {
+  box-shadow: var(--jg-card-shadow-hover);
+  border-color: #D3C3AD;
+}
+
+/* Category Cards */
+.category-card {
+  padding: 1.4rem;
+  border-radius: var(--jg-radius);
+  background: #FFFFFF;
+  border: 1.5px solid var(--jg-cream-border);
+  transition: var(--jg-transition);
+  text-decoration: none;
+  color: var(--jg-navy);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.category-card:hover {
+  border-color: var(--jg-navy);
+  transform: translateY(-3px);
+  box-shadow: var(--jg-card-shadow-hover);
+  color: var(--jg-navy-dark);
+}
+
+.category-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  background-color: var(--jg-navy);
+  color: var(--jg-cream);
+  border: 1px solid var(--jg-navy-light);
+}
+
+/* ==========================================================================
+   Hero Section
+   ========================================================================== */
+
+.jg-hero {
+  padding: 4.5rem 0 3.5rem;
+  background: linear-gradient(180deg, #F4EDE0 0%, var(--jg-gray-bg) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.jg-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1rem;
+  background-color: var(--jg-navy);
+  color: var(--jg-cream);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  border: 1px solid var(--jg-navy-dark);
+}
+
+.hero-search-box {
+  background: #FFFFFF;
+  padding: 1.4rem;
+  border-radius: 16px;
+  border: 1.5px solid var(--jg-cream-border);
+  box-shadow: 0 10px 25px -5px rgba(20, 33, 51, 0.08);
+}
+
+.hero-search-box textarea {
+  border: 1.5px solid var(--jg-cream-border);
+  border-radius: 10px;
+  resize: none;
+  font-size: 1rem;
+}
+
+.hero-search-box textarea:focus {
+  border-color: var(--jg-navy);
+  box-shadow: 0 0 0 3px rgba(20, 33, 51, 0.12);
+}
+
+/* ==========================================================================
+   AI Assistant Page
+   ========================================================================== */
+
+.prompt-pill {
+  display: inline-block;
+  padding: 0.45rem 0.85rem;
+  background-color: #FFFFFF;
+  color: var(--jg-navy);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: var(--jg-transition);
+  border: 1.5px solid var(--jg-cream-border);
+  margin: 0.25rem;
+}
+
+.prompt-pill:hover {
+  background-color: var(--jg-cream);
+  color: var(--jg-navy);
+  border-color: var(--jg-navy);
+}
+
+/* Result Card */
+.result-box {
+  border-top: 4px solid var(--jg-navy);
+  background-color: #FFFFFF;
+}
+
+.confidence-bar {
+  height: 8px;
+  border-radius: 4px;
+  background-color: var(--jg-cream-border);
+  overflow: hidden;
+}
+
+.confidence-fill {
+  height: 100%;
+  border-radius: 4px;
+  background-color: var(--jg-navy);
+  transition: width 0.6s ease-in-out;
+}
+
+.step-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--jg-navy);
+  color: var(--jg-cream);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Relevant Laws Card */
+.law-ref-card {
+  background-color: var(--jg-cream-light);
+  border: 1.5px solid var(--jg-cream-border);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.law-ref-card .law-title {
+  color: var(--jg-navy);
+  font-weight: 700;
+  font-size: 0.98rem;
+}
+
+/* Match Reason Badges */
+.match-reason-list {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 0.5rem;
+}
+
+.match-reason-list li {
+  font-size: 0.82rem;
+  color: var(--jg-navy);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  margin-bottom: 0.3rem;
+}
+
+.match-reason-list li i {
+  color: var(--jg-navy);
+  margin-top: 2px;
+}
+
+/* ==========================================================================
+   Lawyer & Legal Aid Cards
+   ========================================================================== */
+
+.lawyer-card {
+  border: 1.5px solid var(--jg-cream-border);
+  border-radius: var(--jg-radius);
+  background: #FFFFFF;
+  padding: 1.5rem;
+  transition: var(--jg-transition);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.lawyer-card:hover {
+  border-color: var(--jg-navy);
+  box-shadow: var(--jg-card-shadow-hover);
+  transform: translateY(-2px);
+}
+
+.lawyer-avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: var(--jg-navy);
+  color: var(--jg-cream);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.25rem;
+  border: 2px solid var(--jg-cream-border);
+}
+
+.badge-verified {
+  background-color: var(--jg-cream);
+  color: var(--jg-navy);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.55rem;
+  border-radius: 6px;
+  border: 1px solid var(--jg-cream-border);
+}
+
+.badge-pro-bono {
+  background-color: var(--jg-navy);
+  color: var(--jg-cream);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.55rem;
+  border-radius: 6px;
+}
+
+.badge-demo {
+  background-color: #ECE7DE;
+  color: #5A6578;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.25rem 0.55rem;
+  border-radius: 6px;
+  border: 1px solid #D8CFC1;
+}
+
+/* ==========================================================================
+   Disclaimer & Notice Banners
+   ========================================================================== */
+
+.jg-disclaimer-box {
+  background-color: var(--jg-cream);
+  border-left: 4px solid var(--jg-navy);
+  border-radius: 8px;
+  padding: 1.1rem 1.3rem;
+  font-size: 0.88rem;
+  color: var(--jg-navy);
+  margin: 1.5rem 0;
+  border-top: 1px solid var(--jg-cream-border);
+  border-right: 1px solid var(--jg-cream-border);
+  border-bottom: 1px solid var(--jg-cream-border);
+}
+
+.jg-transparency-banner {
+  background-color: #FFFFFF;
+  border: 1.5px solid var(--jg-cream-border);
+  border-left: 5px solid var(--jg-navy);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  font-size: 0.88rem;
+  color: var(--jg-navy);
+  margin-bottom: 1.5rem;
+}
+
+/* ==========================================================================
+   Admin & User Dashboard (Simple, Clean, Functional Standard Styling)
+   ========================================================================== */
+
+.stat-card {
+  padding: 1.25rem;
+  border-radius: var(--jg-radius);
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+}
+
+.admin-sidebar {
+  background-color: #FFFFFF;
+  border-right: 1px solid #E2E8F0;
+  min-height: calc(100vh - 70px);
+}
+
+.admin-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: #1E293B;
+  text-decoration: none;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: var(--jg-transition);
+  margin-bottom: 0.25rem;
+}
+
+.admin-nav-item:hover, .admin-nav-item.active {
+  background-color: var(--jg-cream);
+  color: var(--jg-navy);
+}
+
+/* ==========================================================================
+   Footer (Strictly Deep Navy #142133 with Cream #F4EDE0 Accents)
+   ========================================================================== */
+
+.jg-footer {
+  background-color: var(--jg-navy);
+  color: #CBD5E1;
+  padding: 3.5rem 0 1.5rem;
+  font-size: 0.9rem;
+  border-top: 3.5px solid var(--jg-cream);
+}
+
+.jg-footer a {
+  color: #CBD5E1;
+  text-decoration: none;
+  transition: var(--jg-transition);
+}
+
+.jg-footer a:hover {
+  color: var(--jg-cream);
+}
+
+.jg-footer-title {
+  color: var(--jg-cream);
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+  letter-spacing: -0.01em;
+}
+
+.emergency-box {
+  background-color: var(--jg-navy-dark);
+  border: 1px solid rgba(244, 237, 224, 0.2);
+  color: var(--jg-cream);
+  padding: 0.55rem 0.85rem;
+  border-radius: 6px;
+}
+
+/* ==========================================================================
+   Loading Spinner
+   ========================================================================== */
+
+.spinner-pulse {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(244, 237, 224, 0.3);
+  border-radius: 50%;
+  border-top-color: var(--jg-cream);
+  animation: spin 0.8s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

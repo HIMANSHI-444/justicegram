@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard — {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 px-lg-5">
+  <!-- Admin Header -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-3 border-bottom">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <h2 class="fw-bold mb-0">System Administration & Analytics</h2>
+        <span class="badge bg-danger">Superadmin</span>
+      </div>
+      <p class="text-muted small mb-0">Monitor legal query distributions, manage verified practitioners, review consultations, and manage the NLP model.</p>
+    </div>
+
+    <!-- Retrain Model Action -->
+    <div class="d-flex gap-2">
+      <form action="{{ url_for('admin.retrain_model') }}" method="POST" onsubmit="return confirm('Retrain TF-IDF model on current sample dataset?');">
+        <button type="submit" class="btn btn-jg-navy btn-sm d-flex align-items-center gap-2">
+          <i class="bi bi-arrow-repeat"></i>
+          <span>Retrain AI Classifier</span>
+        </button>
+      </form>
+      <a href="{{ url_for('admin.lawyers_manage') }}" class="btn btn-jg-primary btn-sm">
+        <i class="bi bi-people me-1"></i> Manage Directory
+      </a>
+    </div>
+  </div>
+
+  <!-- Key Metrics Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-2 col-md-4">
+      <div class="stat-card">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="small text-muted">Total Queries</span>
+          <i class="bi bi-cpu text-teal fs-5"></i>
+        </div>
+        <h3 class="fw-bold text-navy mb-0">{{ stats.total_queries }}</h3>
+        <small class="text-success"><i class="bi bi-activity"></i> Active Pipeline</small>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-2 col-md-4">
+      <div class="stat-card">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="small text-muted">Registered Users</span>
+          <i class="bi bi-people text-primary fs-5"></i>
+        </div>
+        <h3 class="fw-bold text-navy mb-0">{{ stats.total_users }}</h3>
+        <small class="text-muted">Citizens & Students</small>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-2 col-md-4">
+      <div class="stat-card">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="small text-muted">Total Lawyers</span>
+          <i class="bi bi-person-badge text-warning fs-5"></i>
+        </div>
+        <h3 class="fw-bold text-navy mb-0">{{ stats.total_lawyers }}</h3>
+        <small class="text-teal fw-semibold">{{ stats.verified_lawyers }} Verified</small>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-2 col-md-4">
+      <div class="stat-card">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="small text-muted">Pro Bono Counsel</span>
+          <i class="bi bi-heart text-danger fs-5"></i>
+        </div>
+        <h3 class="fw-bold text-navy mb-0">{{ stats.pro_bono_lawyers }}</h3>
+        <small class="text-muted">Free Consultation</small>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-2 col-md-4">
+      <div class="stat-card">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="small text-muted">Legal Aid Centers</span>
+          <i class="bi bi-bank fs-5 text-success"></i>
+        </div>
+        <h3 class="fw-bold text-navy mb-0">{{ stats.total_aid }}</h3>
+        <small class="text-muted">DLSA / University</small>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-2 col-md-4">
+      <div class="stat-card">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="small text-muted">Consult Inquiries</span>
+          <i class="bi bi-chat-left-dots text-info fs-5"></i>
+        </div>
+        <h3 class="fw-bold text-navy mb-0">{{ stats.total_inquiries }}</h3>
+        <small class="text-muted">Messages Logged</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Quick Navigation Tabs -->
+  <div class="d-flex gap-2 mb-4 overflow-auto pb-2">
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-teal btn-sm fw-semibold">Overview & Analytics</a>
+    <a href="{{ url_for('admin.lawyers_manage') }}" class="btn btn-jg-outline btn-sm">Lawyer Management</a>
+    <a href="{{ url_for('admin.legal_aid_manage') }}" class="btn btn-jg-outline btn-sm">Legal Aid Management</a>
+    <a href="{{ url_for('admin.queries_manage') }}" class="btn btn-jg-outline btn-sm">Classification Logs</a>
+    <a href="{{ url_for('admin.inquiries_manage') }}" class="btn btn-jg-outline btn-sm">Consultation Inquiries</a>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="row g-4 mb-4">
+    <!-- Chart 1: Categories Distribution -->
+    <div class="col-lg-7">
+      <div class="jg-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0">Legal Queries by Category</h5>
+          <span class="badge bg-light text-muted border">Real-time DB Logs</span>
+        </div>
+        <div style="position: relative; height: 320px;">
+          <canvas id="categoryDistributionChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart 2: Lawyer Fee Types & Pro Bono -->
+    <div class="col-lg-5">
+      <div class="jg-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0">Lawyer Pro Bono Ratio</h5>
+          <span class="badge bg-light text-muted border">Directory Composition</span>
+        </div>
+        <div style="position: relative; height: 320px;">
+          <canvas id="lawyerTypeChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart 3: Inquiry Status -->
+    <div class="col-lg-6">
+      <div class="jg-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0">Consultation Inquiries Status</h5>
+          <span class="badge bg-light text-muted border">Workflow Status</span>
+        </div>
+        <div style="position: relative; height: 260px;">
+          <canvas id="inquiryStatusChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart 4: AI Confidence Distribution -->
+    <div class="col-lg-6">
+      <div class="jg-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0">AI Classification Confidence</h5>
+          <span class="badge bg-light text-muted border">NLP Reliability</span>
+        </div>
+        <div style="position: relative; height: 260px;">
+          <canvas id="confidenceDistributionChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Queries & Inquiries Preview -->
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="jg-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0">Recent User Queries</h5>
+          <a href="{{ url_for('admin.queries_manage') }}" class="small text-teal text-decoration-none">View All Logs</a>
+        </div>
+        {% if recent_queries %}
+          <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr class="small text-muted">
+                  <th>Time</th>
+                  <th>Category</th>
+                  <th>Confidence</th>
+                  <th>Query Excerpt</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for q in recent_queries %}
+                  <tr>
+                    <td class="small text-muted">{{ q.created_at.strftime('%H:%M') if q.created_at else '' }}</td>
+                    <td><span class="badge bg-teal-soft text-teal small">{{ q.predicted_category }}</span></td>
+                    <td class="small fw-semibold">{{ q.confidence_score }}%</td>
+                    <td class="small text-truncate" style="max-width: 180px;">{{ q.query_text }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="text-muted small">No queries logged yet.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="jg-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0">Recent Inquiries</h5>
+          <a href="{{ url_for('admin.inquiries_manage') }}" class="small text-teal text-decoration-none">View All Inquiries</a>
+        </div>
+        {% if recent_inquiries %}
+          <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr class="small text-muted">
+                  <th>User / Phone</th>
+                  <th>Lawyer</th>
+                  <th>Subject</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for inq in recent_inquiries %}
+                  <tr>
+                    <td class="small">
+                      <div class="fw-semibold">{{ inq.user.name }}</div>
+                      <small class="text-muted">{{ inq.user_phone or inq.user.email }}</small>
+                    </td>
+                    <td class="small">Adv. {{ inq.lawyer.name }}</td>
+                    <td class="small text-truncate" style="max-width: 160px;">{{ inq.subject }}</td>
+                    <td>
+                      <span class="badge {% if inq.status == 'Pending' %}bg-warning text-dark{% elif inq.status == 'Contacted' %}bg-primary{% else %}bg-success{% endif %} small">
+                        {{ inq.status }}
+                      </span>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="text-muted small">No inquiries submitted yet.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/admin_charts.js') }}"></script>
+{% endblock %}
