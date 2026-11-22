@@ -1,16 +1,20 @@
 import os
 import sys
-from pathlib import Path
 
-# Add project root directory to sys.path so 'app' and all project modules can be imported seamlessly
-ROOT_DIR = Path(__file__).resolve().parent.parent
-if str(ROOT_DIR) not in sys.path:
-    sys.path.insert(0, str(ROOT_DIR))
+# Ensure root directory is in python search path
+root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if root not in sys.path:
+    sys.path.insert(0, root)
 
-from app import create_app
-
-env = 'production' if os.environ.get('VERCEL') else os.environ.get('FLASK_ENV', 'development')
-app = create_app(env)
-
-if __name__ == '__main__':
-    app.run(debug=True)
+try:
+    from app import create_app
+    app = create_app('production')
+except Exception as e:
+    # Safe fallback handler in case of cold-start exception
+    from flask import Flask
+    app = Flask(__name__)
+    @app.route('/', defaults={'path': ''})
+    @app.route('/<path:path>')
+    def catch_all(path):
+        import traceback
+        return f"<h3>JusticeGram Startup Error</h3><pre>{traceback.format_exc()}</pre>", 500
