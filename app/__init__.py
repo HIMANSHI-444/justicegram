@@ -40,6 +40,13 @@ def create_app(config_name=None):
     # Initialize extensions
     db.init_app(app)
 
+    # Automatically create database tables if running in serverless (e.g. Vercel)
+    with app.app_context():
+        try:
+            db.create_all()
+        except Exception:
+            pass
+
     # Load logged-in user into Flask 'g' context
     @app.before_request
     def load_logged_in_user():

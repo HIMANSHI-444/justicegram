@@ -1,0 +1,8 @@
+[project]
+name = "justicegram"
+version = "1.0.0"
+description = "JusticeGram - AI-Powered Legal Assistance Platform"
+requires-python = ">=3.10"
+
+[tool.vercel]
+entrypoint = "run:app"

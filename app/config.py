@@ -23,7 +23,9 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'justicegram-academic-secret-key-2026')
     
     # Database - SQLite by default with easy migration path to MySQL/PostgreSQL
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URI', f"sqlite:///{BASE_DIR / 'justicegram.db'}")
+    # In Vercel serverless environment, local filesystem root is read-only so use /tmp
+    _default_db = '/tmp/justicegram.db' if os.environ.get('VERCEL') else str(BASE_DIR / 'justicegram.db')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URI', f"sqlite:///{_default_db}")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # AI Model Artifacts Paths
