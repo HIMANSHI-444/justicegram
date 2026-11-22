@@ -85,6 +85,7 @@ venv.bak/
 
 # Project-specific database files
 justicegram.db
+!app/data/default_justicegram.db
 
 # Flask instance folder (contains instance-specific databases and configs)
 instance/

@@ -24,7 +24,18 @@ class Config:
     
     # Database - SQLite by default with easy migration path to MySQL/PostgreSQL
     # In Vercel serverless environment, local filesystem root is read-only so use /tmp
-    _default_db = '/tmp/justicegram.db' if os.environ.get('VERCEL') else str(BASE_DIR / 'justicegram.db')
+    _default_db = str(BASE_DIR / 'justicegram.db')
+    if os.environ.get('VERCEL'):
+        import shutil
+        tmp_db = Path('/tmp/justicegram.db')
+        seed_db = RESOLVED_DATA_DIR / 'default_justicegram.db'
+        if not tmp_db.exists() and seed_db.exists():
+            try:
+                shutil.copyfile(seed_db, tmp_db)
+            except Exception:
+                pass
+        _default_db = str(tmp_db)
+
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URI', f"sqlite:///{_default_db}")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

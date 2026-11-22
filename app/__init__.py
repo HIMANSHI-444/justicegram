@@ -69,12 +69,18 @@ def create_app(config_name=None):
     # Error handlers
     @app.errorhandler(404)
     def not_found_error(error):
-        return render_template('errors/404.html'), 404
+        try:
+            return render_template('errors/404.html'), 404
+        except Exception:
+            return "<h1>404 Not Found</h1>", 404
 
     @app.errorhandler(500)
     def internal_error(error):
         db.session.rollback()
-        return render_template('errors/500.html'), 500
+        try:
+            return render_template('errors/500.html'), 500
+        except Exception:
+            return "<h1>500 Internal Server Error</h1>", 500
 
     # Register blueprints
     from app.routes.main import main_bp
