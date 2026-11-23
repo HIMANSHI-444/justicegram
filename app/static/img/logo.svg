@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 100" width="100%" height="100%">
+  <defs>
+    <!-- Background / Icon Gradients -->
+    <linearGradient id="iconBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a1128"/>
+      <stop offset="100%" stop-color="#1c2541"/>
+    </linearGradient>
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8f4e3"/>
+      <stop offset="50%" stop-color="#eedc9a"/>
+      <stop offset="100%" stop-color="#d4af37"/>
+    </linearGradient>
+    <filter id="subtleShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Logo Icon Container -->
+  <g transform="translate(15, 12)" filter="url(#subtleShadow)">
+    <rect x="0" y="0" width="76" height="76" rx="18" fill="url(#iconBg)" stroke="#eedc9a" stroke-width="2.5"/>
+    
+    <!-- Legal Pillar / Courthouse Icon Symbol (bi-bank2) -->
+    <!-- Pediment (Roof) -->
+    <path d="M38 18 L16 31 L60 31 Z" fill="url(#goldGradient)"/>
+    <rect x="14" y="32" width="48" height="3" rx="1.5" fill="url(#goldGradient)"/>
+    
+    <!-- Pillars -->
+    <rect x="18" y="38" width="5.5" height="18" rx="1" fill="url(#goldGradient)"/>
+    <rect x="27.5" y="38" width="5.5" height="18" rx="1" fill="url(#goldGradient)"/>
+    <rect x="37" y="38" width="5.5" height="18" rx="1" fill="url(#goldGradient)"/>
+    <rect x="46.5" y="38" width="5.5" height="18" rx="1" fill="url(#goldGradient)"/>
+    
+    <!-- Base -->
+    <rect x="14" y="58" width="48" height="4" rx="1.5" fill="url(#goldGradient)"/>
+    <rect x="11" y="63" width="54" height="3" rx="1.5" fill="url(#goldGradient)"/>
+  </g>
+
+  <!-- Typography: JusticeGram -->
+  <text x="110" y="62" font-family="'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="44" font-weight="800" fill="#0a1128" letter-spacing="-1.5">
+    Justice<tspan fill="#0d9488">Gram</tspan>
+  </text>
+  
+  <!-- Subtitle Tagline -->
+  <text x="112" y="80" font-family="'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#64748b" letter-spacing="1.5">
+    AI-POWERED LEGAL PLATFORM
+  </text>
+</svg>

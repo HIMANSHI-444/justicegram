@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <defs>
+    <linearGradient id="iconBgSquare" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a1128"/>
+      <stop offset="100%" stop-color="#1c2541"/>
+    </linearGradient>
+    <linearGradient id="goldSquare" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8f4e3"/>
+      <stop offset="50%" stop-color="#eedc9a"/>
+      <stop offset="100%" stop-color="#d4af37"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#iconBgSquare)" stroke="#eedc9a" stroke-width="3"/>
+
+  <!-- Bank / Courthouse Symbol -->
+  <path d="M50 20 L20 38 L80 38 Z" fill="url(#goldSquare)"/>
+  <rect x="18" y="39" width="64" height="4" rx="2" fill="url(#goldSquare)"/>
+
+  <!-- 4 Pillars -->
+  <rect x="23" y="46" width="7" height="24" rx="1.5" fill="url(#goldSquare)"/>
+  <rect x="36" y="46" width="7" height="24" rx="1.5" fill="url(#goldSquare)"/>
+  <rect x="49" y="46" width="7" height="24" rx="1.5" fill="url(#goldSquare)"/>
+  <rect x="62" y="46" width="7" height="24" rx="1.5" fill="url(#goldSquare)"/>
+
+  <!-- Pedestal -->
+  <rect x="18" y="72" width="64" height="5" rx="2" fill="url(#goldSquare)"/>
+  <rect x="14" y="79" width="72" height="4" rx="2" fill="url(#goldSquare)"/>
+</svg>
